@@ -1,0 +1,4 @@
+{
+    "ttsApi": "https://www.example.com/tts",
+    "llmApi": "https://www.example.com/api/v1/generate"
+}
