@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+README.md
+
+# GitHub Actions
+.github
+
+# Node modules and build artifacts
+frontend/node_modules
+frontend/build
+frontend/.svelte-kit
+
+# Rust build artifacts
+backend/target
+backend/Cargo.lock
+
+# IDE files
+.vscode
+.idea
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Development files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Cache
+.cache

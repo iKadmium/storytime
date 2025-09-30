@@ -1,0 +1,93 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  frontend:
+    name: Frontend Build, Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          pnpm install
+
+      - name: Lint frontend
+        run: |
+          cd frontend
+          pnpm lint
+
+      - name: Check types
+        run: |
+          cd frontend
+          pnpm check
+
+      - name: Build frontend
+        run: |
+          cd frontend
+          pnpm build
+
+      - name: Test frontend
+        run: |
+          cd frontend
+          pnpm test
+
+  backend:
+    name: Backend Build, Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+
+      - name: Format check
+        run: |
+          cd backend
+          cargo fmt --all -- --check
+
+      - name: Lint backend
+        run: |
+          cd backend
+          cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Build backend
+        run: |
+          cd backend
+          cargo build --verbose
+
+      - name: Test backend
+        run: |
+          cd backend
+          cargo test --verbose
