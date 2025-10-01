@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CreateJobRequest, Job } from '$lib/models/job.js';
 	import Button from '$lib/components/Button/Button.svelte';
+	import { formatCadence } from '$lib/utils/cron';
 
 	interface Props {
 		job?: Job;
@@ -27,6 +28,8 @@
 	let promptError = $state('');
 	let cadenceError = $state('');
 	let promptOverrideError = $state('');
+
+	let cadencePlain = $derived(formatCadence(cadence));
 
 	function handleTest() {
 		if (onTest && character.trim() && prompt.trim()) {
@@ -125,7 +128,7 @@
 			/>
 		{/if}
 		{#if characterError}
-			<div class="mt-1 text-sm text-error-500">{characterError}</div>
+			<div class="text-error-500 mt-1 text-sm">{characterError}</div>
 		{/if}
 	</div>
 
@@ -153,7 +156,7 @@
 			/>
 		{/if}
 		{#if promptError}
-			<div class="mt-1 text-sm text-error-500">{promptError}</div>
+			<div class="text-error-500 mt-1 text-sm">{promptError}</div>
 		{/if}
 	</div>
 
@@ -172,11 +175,12 @@
 			disabled={isSubmitting}
 		/>
 		{#if cadenceError}
-			<div class="mt-1 text-sm text-error-500">{cadenceError}</div>
+			<div class="text-error-500 mt-1 text-sm">{cadenceError}</div>
 		{:else}
-			<div class="mt-1 text-sm text-surface-500">
+			<div class="text-surface-500 mt-1 text-sm">
 				Format: minute hour day month day-of-week (e.g., "30 9,10,11 * * 1-5" = 9:30, 10:30, 11:30 AM on weekdays)
 			</div>
+			<div class="text-surface-500 mt-1 text-sm">Current parsed value: "{cadencePlain || 'N/A'}"</div>
 		{/if}
 	</div>
 
@@ -186,7 +190,7 @@
 			<input type="checkbox" class="checkbox" bind:checked={usePromptOverride} disabled={isSubmitting} />
 			<span>Use custom prompt override</span>
 		</label>
-		<div class="mt-1 text-sm text-surface-500">Enable this to override the default prompt template for this specific job</div>
+		<div class="text-surface-500 mt-1 text-sm">Enable this to override the default prompt template for this specific job</div>
 	</div>
 
 	<!-- Prompt Override Field (only shown when checkbox is checked) -->
@@ -205,9 +209,9 @@
 				disabled={isSubmitting}
 			></textarea>
 			{#if promptOverrideError}
-				<div class="mt-1 text-sm text-error-500">{promptOverrideError}</div>
+				<div class="text-error-500 mt-1 text-sm">{promptOverrideError}</div>
 			{:else}
-				<div class="mt-1 text-sm text-surface-500">This text will override the default prompt template for this specific job</div>
+				<div class="text-surface-500 mt-1 text-sm">This text will override the default prompt template for this specific job</div>
 			{/if}
 		</div>
 	{/if}

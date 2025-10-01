@@ -51,6 +51,7 @@
 	},
 	"dependencies": {
 		"@skeletonlabs/skeleton": "^3.2.2",
-		"@skeletonlabs/skeleton-svelte": "^1.5.2"
+		"@skeletonlabs/skeleton-svelte": "^1.5.2",
+		"cronstrue": "^3.3.0"
 	}
 }

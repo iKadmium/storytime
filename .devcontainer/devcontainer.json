@@ -6,6 +6,17 @@
 	"image": "mcr.microsoft.com/devcontainers/rust:latest",
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {}
+	},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vadimcn.vscode-lldb",
+				"dbaeumer.vscode-eslint",
+				"tamasfe.even-better-toml",
+				"rust-lang.rust-analyzer",
+				"svelte.svelte-vscode"
+			]
+		}
 	}
 	// Use 'mounts' to make the cargo cache persistent in a Docker Volume.
 	// "mounts": [
