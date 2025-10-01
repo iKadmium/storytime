@@ -17,7 +17,7 @@
 	let { jobs, onEdit, onDelete, onView, onExecute, isLoading = false, generateFilename }: Props = $props();
 
 	function handleEdit(job: Job) {
-		const filename = generateFilename(job.characters.join(','), job.prompts.join(','));
+		const filename = job.id || generateFilename(job.characters.join(','), job.prompts.join(','));
 		onEdit(job, filename);
 	}
 
@@ -26,7 +26,7 @@
 	}
 
 	function handleView(job: Job) {
-		const filename = generateFilename(job.characters.join(','), job.prompts.join(','));
+		const filename = job.id || generateFilename(job.characters.join(','), job.prompts.join(','));
 		onView(job, filename);
 	}
 
@@ -50,13 +50,14 @@
 	{:else}
 		<!-- Desktop Grid View -->
 		<div class="hidden gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
-			{#each jobs as job (`${job.characters.join(',')}-${job.prompts.join(',')}`)}
+			{#each jobs as job (job.id || `${job.characters.join(',')}-${job.prompts.join(',')}`)}
 				<ItemCard
 					title={`Characters (${job.characters.length}) → Prompts (${job.prompts.length})`}
 					description={job['prompt-override'] || 'No custom prompt override'}
 					badge={formatCadence(job.cadence)}
 					badgeColor="tertiary"
 					fields={[
+						{ label: 'ID', value: job.id || 'Legacy Job' },
 						{ label: 'Characters', value: job.characters.join(', ') },
 						{ label: 'Prompts', value: job.prompts.join(', ') },
 						{ label: 'Cron Expression', value: job.cadence }
@@ -71,7 +72,7 @@
 
 		<!-- Mobile List View -->
 		<div class="space-y-4 md:hidden">
-			{#each jobs as job (`${job.characters.join(',')}-${job.prompts.join(',')}`)}
+			{#each jobs as job (job.id || `${job.characters.join(',')}-${job.prompts.join(',')}`)}
 				<ItemListCard
 					title={`Characters (${job.characters.length}) → Prompts (${job.prompts.length})`}
 					description={job['prompt-override'] || 'No custom prompt override'}

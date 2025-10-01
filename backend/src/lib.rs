@@ -1,6 +1,7 @@
 pub mod ai_services;
 pub mod chatml;
 pub mod controllers;
+pub mod job_scheduler;
 pub mod llm_prompt;
 pub mod models;
 pub mod routes;

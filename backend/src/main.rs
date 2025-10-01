@@ -1,4 +1,4 @@
-use backend::{create_app, load_settings};
+use backend::{create_app, job_scheduler::start_scheduler, load_settings};
 use std::{net::SocketAddr, sync::Arc};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -26,6 +26,13 @@ async fn main() {
             std::process::exit(1);
         }
     };
+
+    // Start the job scheduler
+    if let Err(e) = start_scheduler(Arc::clone(&settings)).await {
+        tracing::error!("Failed to start job scheduler: {}", e);
+        std::process::exit(1);
+    }
+    tracing::info!("Job scheduler started successfully");
 
     // Build our application
     let app = create_app(settings);

@@ -8,7 +8,7 @@
 
 	import type { Job, CreateJobRequest, UpdateJobRequest } from '$lib/models/job';
 	import type { Message } from '$lib/models/chat';
-	import { fetchJobs, createJob, updateJob, deleteJob, executeJob } from '$lib/services/job-service';
+	import { fetchJobs, createJob, updateJobById, deleteJobById, executeJob } from '$lib/services/job-service';
 	import { jobSlug } from '$lib/utils/slug';
 	import { fetchCharacters } from '$lib/services/character-service';
 	import { fetchPrompts } from '$lib/services/prompt-service';
@@ -90,8 +90,12 @@
 		try {
 			isSubmitting = true;
 			error = null;
-			// Use the first character and prompt for the deletion API (we'll need to update this later)
-			await deleteJob(job.characters[0] || '', job.prompts[0] || '');
+
+			if (job.id) {
+				// Use UUID for new jobs
+				await deleteJobById(job.id);
+			}
+
 			await loadJobs(); // Reload the list
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to delete job';
@@ -102,7 +106,7 @@
 	}
 
 	async function handleExecuteJob(job: Job) {
-		const jobId = `${job.characters.join(',')}-${job.prompts.join(',')}`;
+		const jobId = job.id || `${job.characters.join(',')}-${job.prompts.join(',')}`;
 		try {
 			_executingJobId = jobId;
 			error = null;
@@ -118,7 +122,7 @@
 	}
 
 	async function handleTestJob2(job: Job) {
-		const jobId = `${job.characters.join(',')}-${job.prompts.join(',')}`;
+		const jobId = job.id || `${job.characters.join(',')}-${job.prompts.join(',')}`;
 		try {
 			_executingJobId = jobId;
 			error = null;
@@ -160,13 +164,17 @@
 			if (editingJob) {
 				// Update existing job
 				const updates: UpdateJobRequest = {
+					id: editingJob.id,
 					characters: jobData.characters,
 					prompts: jobData.prompts,
 					cadence: jobData.cadence,
 					'prompt-override': jobData['prompt-override']
 				};
-				// Use the first character and prompt for the update API (we'll need to update this later)
-				await updateJob(editingJob.characters[0] || '', editingJob.prompts[0] || '', updates);
+
+				if (editingJob.id) {
+					// Use UUID for new jobs
+					await updateJobById(editingJob.id, updates);
+				}
 			} else {
 				// Create new job
 				await createJob(jobData);

@@ -26,7 +26,12 @@ pub fn prompt_slug(title: &str) -> String {
     to_slug(title)
 }
 
-/// Generate a slug for a job based on character and prompt
+/// Generate a new UUID for a job
+pub fn generate_job_id() -> uuid::Uuid {
+    uuid::Uuid::new_v4()
+}
+
+/// Generate a slug for a job based on character and prompt (legacy function for backward compatibility)
 /// Format: {character_slug}-{prompt_slug}
 pub fn job_slug(character: &str, prompt: &str) -> String {
     let character_slug = to_slug(character);
@@ -44,12 +49,17 @@ pub fn prompt_file_path(title: &str) -> String {
     format!("./data/prompts/{}.json", prompt_slug(title))
 }
 
-/// Generate a file path for a job
+/// Generate a file path for a job using UUID
+pub fn job_file_path_from_id(id: &uuid::Uuid) -> String {
+    format!("./data/jobs/{}.json", id)
+}
+
+/// Generate a file path for a job (legacy function for backward compatibility)
 pub fn job_file_path(character: &str, prompt: &str) -> String {
     format!("./data/jobs/{}.json", job_slug(character, prompt))
 }
 
-/// Generate a file path for a job from its slug
+/// Generate a file path for a job from its slug (legacy function for backward compatibility)
 pub fn job_file_path_from_slug(slug: &str) -> String {
     format!("./data/jobs/{slug}.json")
 }

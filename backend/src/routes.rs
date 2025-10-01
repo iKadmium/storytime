@@ -21,10 +21,11 @@ use crate::controllers::{
     },
     health_controller::{health_check, hello, hello_name},
     job_controller::{
-        create_job, delete_job, get_job, get_jobs, run_job, run_job_by_slug,
+        create_job, delete_job, get_job, get_jobs, migrate_jobs, run_job, run_job_by_slug,
         test_character_with_prompt, test_prompt_with_character, update_job,
     },
     prompt_controller::{create_prompt, delete_prompt, get_prompt, get_prompts, update_prompt},
+    scheduler_controller::{get_scheduler_status, reload_scheduler_jobs},
 };
 use crate::models::Settings;
 
@@ -82,9 +83,14 @@ pub fn create_app(settings: Arc<Settings>) -> Router {
         // Job execution routes
         .route("/api/jobs/{slug}/run", post(run_job_by_slug))
         .route("/api/jobs/run", post(run_job))
+        // Job migration route
+        .route("/api/jobs/migrate", post(migrate_jobs))
         // Test routes
         .route("/api/test/prompt", post(test_prompt_with_character))
         .route("/api/test/character", post(test_character_with_prompt))
+        // Scheduler routes
+        .route("/api/scheduler/status", get(get_scheduler_status))
+        .route("/api/scheduler/reload", post(reload_scheduler_jobs))
         // Static file serving from assets directory - serve at root for SPA compatibility
         .fallback_service(
             ServeDir::new("assets").not_found_service(ServeFile::new("assets/index.html")),

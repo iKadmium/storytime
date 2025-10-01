@@ -235,6 +235,7 @@ pub struct UpdateMessageRequest {
 // Job models
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Job {
+    pub id: Option<uuid::Uuid>,
     pub characters: Vec<String>,
     pub prompts: Vec<String>,
     pub cadence: String,
@@ -254,6 +255,7 @@ pub struct CreateJobRequest {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateJobRequest {
+    pub id: Option<uuid::Uuid>,
     pub characters: Vec<String>,
     pub prompts: Vec<String>,
     pub cadence: String,

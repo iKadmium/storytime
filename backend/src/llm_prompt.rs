@@ -189,6 +189,8 @@ pub fn build_simple_prompt(_job: &Job, character: &Character, prompt: &Prompt) -
 
 #[cfg(test)]
 mod tests {
+    use uuid::Uuid;
+
     use super::*;
     use crate::models::Voice;
 
@@ -225,6 +227,7 @@ mod tests {
 
     fn create_test_job() -> Job {
         Job {
+            id: Some(Uuid::parse_str("12345678-9012-3456-7890-123456789012").unwrap()),
             characters: vec!["Test Knight".to_string()],
             prompts: vec!["Test Prompt".to_string()],
             cadence: "daily".to_string(),

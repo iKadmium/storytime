@@ -4,3 +4,4 @@ pub mod chat_controller;
 pub mod health_controller;
 pub mod job_controller;
 pub mod prompt_controller;
+pub mod scheduler_controller;

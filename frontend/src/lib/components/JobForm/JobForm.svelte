@@ -71,8 +71,8 @@
 			isValid = false;
 		} else {
 			const cronParts = cadence.trim().split(/\s+/);
-			if (cronParts.length !== 5) {
-				cadenceError = 'Cadence must be a valid cron expression (5 parts)';
+			if (cronParts.length !== 6) {
+				cadenceError = 'Cadence must be a valid cron expression (6 parts)';
 				isValid = false;
 			}
 		}

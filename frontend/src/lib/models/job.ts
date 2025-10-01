@@ -1,4 +1,5 @@
 export interface Job {
+	id?: string; // UUID
 	characters: string[];
 	prompts: string[];
 	cadence: string;
@@ -13,6 +14,7 @@ export interface CreateJobRequest {
 }
 
 export interface UpdateJobRequest {
+	id?: string; // UUID
 	characters: string[];
 	prompts: string[];
 	cadence: string;
