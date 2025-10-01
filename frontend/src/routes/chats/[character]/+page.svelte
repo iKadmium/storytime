@@ -37,6 +37,10 @@
 			.join('')
 			.substring(0, 2);
 	}
+
+	function getAudioUrl(character: string, audioId: string): string {
+		return `/audio/${encodeURIComponent(toSlug(character))}/${audioId}.mp3`;
+	}
 </script>
 
 <svelte:head>
@@ -108,9 +112,8 @@
 								{#if message.audio.length > 0}
 									<div class="message-audio">
 										{#each message.audio as audioId, index (index)}
-											{@const audioUrl = `/audio/${encodeURIComponent(toSlug(chat.character))}/${audioId}.mp3`}
 											<audio controls>
-												<source src={audioUrl} type="audio/mpeg" />
+												<source src={getAudioUrl(chat.character, audioId)} type="audio/mpeg" />
 												Audio not supported
 											</audio>
 										{/each}
