@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/iKadmium/storytime/compare/backend-v0.2.1...backend-v0.3.0) (2025-10-01)
+
+
+### Features
+
+* random selection of characters and prompts in jobs ([d4bf304](https://github.com/iKadmium/storytime/commit/d4bf304ccbe13c317cca6dff10a066539a95f21a))
+
+
+### Bug Fixes
+
+* fix message text splitting ([b60d508](https://github.com/iKadmium/storytime/commit/b60d508f510695f039efd0ab16b52403d750f927))
+
 ## [0.2.1](https://github.com/iKadmium/storytime/compare/backend-v0.2.0...backend-v0.2.1) (2025-10-01)
 
 
