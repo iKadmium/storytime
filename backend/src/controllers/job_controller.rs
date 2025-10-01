@@ -1,6 +1,5 @@
 use axum::{
-    Json as JsonExtract,
-    extract::{Path, State},
+    extract::{Json as JsonExtract, Path, State},
     http::StatusCode,
     response::Json,
 };
@@ -87,8 +86,8 @@ pub async fn create_job(
     JsonExtract(request): JsonExtract<CreateJobRequest>,
 ) -> Result<Json<ApiResponse<Job>>, (StatusCode, Json<ApiResponse<()>>)> {
     let job = Job {
-        character: request.character,
-        prompt: request.prompt,
+        characters: request.characters,
+        prompts: request.prompts,
         cadence: request.cadence,
         prompt_override: request.prompt_override,
     };
@@ -122,8 +121,8 @@ pub async fn update_job(
         Ok(_existing_job) => {
             // PUT replaces the entire resource
             let job = Job {
-                character: request.character,
-                prompt: request.prompt,
+                characters: request.characters,
+                prompts: request.prompts,
                 cadence: request.cadence,
                 prompt_override: request.prompt_override,
             };
@@ -209,7 +208,10 @@ pub async fn delete_job(
             data: None,
             message: format!(
                 "Job '{}' deleted successfully",
-                job_slug(&job.character, &job.prompt)
+                job_slug(
+                    job.characters.first().unwrap_or(&"default".to_string()),
+                    job.prompts.first().unwrap_or(&"default".to_string())
+                )
             ),
         })),
         Err(e) => {
@@ -272,33 +274,76 @@ async fn run_job_internal(
     settings: Arc<Settings>,
     save_to_chat_history: bool,
 ) -> Result<Json<ApiResponse<Message>>, (StatusCode, Json<ApiResponse<()>>)> {
-    // Load the character
-    let character = match load_character(&job.character).await {
+    use rand::{SeedableRng, rngs::StdRng, seq::SliceRandom};
+
+    // Validate that we have at least one character and prompt
+    if job.characters.is_empty() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse {
+                success: false,
+                data: None,
+                message: "Job must have at least one character".to_string(),
+            }),
+        ));
+    }
+
+    if job.prompts.is_empty() {
+        return Err((
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse {
+                success: false,
+                data: None,
+                message: "Job must have at least one prompt".to_string(),
+            }),
+        ));
+    }
+
+    // Randomly select a character and prompt using a Send-safe RNG
+    let mut rng = StdRng::from_entropy();
+    let selected_character_name = job.characters.choose(&mut rng).unwrap();
+    let selected_prompt_name = job.prompts.choose(&mut rng).unwrap();
+
+    tracing::info!(
+        "Randomly selected character '{}' and prompt '{}' for job execution",
+        selected_character_name,
+        selected_prompt_name
+    );
+
+    // Load the selected character
+    let character = match load_character(selected_character_name).await {
         Ok(character) => character,
         Err(e) => {
-            tracing::error!("Failed to load character '{}': {}", job.character, e);
+            tracing::error!(
+                "Failed to load character '{}': {}",
+                selected_character_name,
+                e
+            );
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(ApiResponse {
                     success: false,
                     data: None,
-                    message: format!("Failed to load character '{}': {}", job.character, e),
+                    message: format!(
+                        "Failed to load character '{}': {}",
+                        selected_character_name, e
+                    ),
                 }),
             ));
         }
     };
 
-    // Load the prompt
-    let prompt = match load_prompt(&job.prompt).await {
+    // Load the selected prompt
+    let prompt = match load_prompt(selected_prompt_name).await {
         Ok(prompt) => prompt,
         Err(e) => {
-            tracing::error!("Failed to load prompt '{}': {}", job.prompt, e);
+            tracing::error!("Failed to load prompt '{}': {}", selected_prompt_name, e);
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(ApiResponse {
                     success: false,
                     data: None,
-                    message: format!("Failed to load prompt '{}': {}", job.prompt, e),
+                    message: format!("Failed to load prompt '{}': {}", selected_prompt_name, e),
                 }),
             ));
         }
@@ -324,11 +369,16 @@ async fn load_all_jobs() -> Result<Vec<Job>, Box<dyn std::error::Error + Send + 
         }
     }
 
-    // Sort jobs by character name and then by prompt for consistent ordering
+    // Sort jobs by first character name and then by first prompt for consistent ordering
     jobs.sort_by(|a, b| {
-        a.character
-            .cmp(&b.character)
-            .then_with(|| a.prompt.cmp(&b.prompt))
+        let a_first_char = a.characters.first().map(|s| s.as_str()).unwrap_or("");
+        let b_first_char = b.characters.first().map(|s| s.as_str()).unwrap_or("");
+        let a_first_prompt = a.prompts.first().map(|s| s.as_str()).unwrap_or("");
+        let b_first_prompt = b.prompts.first().map(|s| s.as_str()).unwrap_or("");
+
+        a_first_char
+            .cmp(b_first_char)
+            .then_with(|| a_first_prompt.cmp(b_first_prompt))
     });
     Ok(jobs)
 }
@@ -342,10 +392,14 @@ async fn load_job_by_slug(slug: &str) -> Result<Job, Box<dyn std::error::Error +
 }
 
 /// Save a job to a JSON file
-/// Generates a slug based on character and prompt
+/// Generates a slug based on first character and first prompt
 async fn save_job(job: &Job) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-    let slug = job_slug(&job.character, &job.prompt);
-    let file_path = job_file_path(&job.character, &job.prompt);
+    let default_character = "default".to_string();
+    let default_prompt = "default".to_string();
+    let first_character = job.characters.first().unwrap_or(&default_character);
+    let first_prompt = job.prompts.first().unwrap_or(&default_prompt);
+    let slug = job_slug(first_character, first_prompt);
+    let file_path = job_file_path(first_character, first_prompt);
     let json_content = serde_json::to_string_pretty(job)?;
     fs::write(&file_path, json_content).await?;
     Ok(slug)
@@ -415,17 +469,29 @@ async fn run_job_internal_with_prompt(
     settings: Arc<Settings>,
     save_to_chat_history: bool,
 ) -> Result<Json<ApiResponse<Message>>, (StatusCode, Json<ApiResponse<()>>)> {
+    // Get the first character name (for testing, we expect only one)
+    let character_name = job.characters.first().ok_or_else(|| {
+        (
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse {
+                success: false,
+                data: None,
+                message: "Job must have at least one character".to_string(),
+            }),
+        )
+    })?;
+
     // Load the character
-    let character = match load_character(&job.character).await {
+    let character = match load_character(character_name).await {
         Ok(character) => character,
         Err(e) => {
-            tracing::error!("Failed to load character '{}': {}", job.character, e);
+            tracing::error!("Failed to load character '{}': {}", character_name, e);
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(ApiResponse {
                     success: false,
                     data: None,
-                    message: format!("Failed to load character '{}': {}", job.character, e),
+                    message: format!("Failed to load character '{}': {}", character_name, e),
                 }),
             ));
         }
@@ -511,7 +577,7 @@ async fn execute_ai_services(
 ) -> Result<Message, (StatusCode, Json<ApiResponse<()>>)> {
     // Try to load existing chat history (optional)
     let chat_history = Chat {
-        character: job.character.clone(),
+        character: character.name.clone(),
         messages: Vec::new(),
     };
 
@@ -537,7 +603,7 @@ async fn execute_ai_services(
     if prompt.create_audio {
         let default_voice = Voice::default();
         let voice = character.voice.as_ref().unwrap_or(&default_voice);
-        match call_tts(&settings, &llm_responses.join(" "), voice).await {
+        match call_tts(&settings, &llm_responses.join("\n"), voice).await {
             Ok(tts_audio) => {
                 if save_to_chat_history {
                     // Save the audio to a file in data/audio/{character}/{id}.mp3
@@ -598,7 +664,7 @@ async fn run_job_with_character_and_prompt(
         execute_ai_services(&job, &character, &prompt, settings, save_to_chat_history).await?;
 
     // Optionally save the message to chat history
-    if save_to_chat_history && let Err(e) = save_message_to_chat(&job.character, &message).await {
+    if save_to_chat_history && let Err(e) = save_message_to_chat(&character.name, &message).await {
         tracing::warn!("Failed to save message to chat history: {}", e);
         // Don't fail the entire operation if we can't save to chat history
     }
@@ -617,8 +683,8 @@ pub async fn test_prompt_with_character(
 ) -> Result<Json<ApiResponse<Message>>, (StatusCode, Json<ApiResponse<()>>)> {
     // Create a temporary job with the provided prompt and character
     let job = Job {
-        character: request.character_name,
-        prompt: request.prompt.title.clone(),
+        characters: vec![request.character_name],
+        prompts: vec![request.prompt.title.clone()],
         cadence: "once".to_string(),
         prompt_override: None,
     };
@@ -650,8 +716,8 @@ pub async fn test_character_with_prompt(
 
     // Create a temporary job with the provided character and prompt
     let job = Job {
-        character: request.character.name.clone(),
-        prompt: request.prompt_name,
+        characters: vec![request.character.name.clone()],
+        prompts: vec![request.prompt_name],
         cadence: "once".to_string(),
         prompt_override: None,
     };

@@ -19,7 +19,7 @@
 
 {#if job}
 	<DetailModal
-		title={`${job.character} → ${job.prompt}`}
+		title={`Job: Characters (${job.characters.length}) → Prompts (${job.prompts.length})`}
 		{isOpen}
 		{onClose}
 		onEdit={onEdit ? () => onEdit(job, filename) : undefined}
@@ -32,14 +32,14 @@
 		<FieldDisplay
 			fields={[
 				{
-					icon: '👤',
-					label: 'Character',
-					value: job.character
+					icon: '�',
+					label: 'Characters',
+					value: job.characters.length > 0 ? job.characters.join(', ') : 'None selected'
 				},
 				{
 					icon: '💬',
-					label: 'Prompt',
-					value: job.prompt
+					label: 'Prompts',
+					value: job.prompts.length > 0 ? job.prompts.join(', ') : 'None selected'
 				},
 				{
 					icon: '⏰',
@@ -50,6 +50,11 @@
 					icon: '🔧',
 					label: 'Cron Expression',
 					value: job.cadence
+				},
+				{
+					icon: '🎲',
+					label: 'Execution',
+					value: 'Randomly selects 1 character and 1 prompt from the lists above when running'
 				},
 				{
 					icon: '📝',

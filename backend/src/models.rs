@@ -230,8 +230,8 @@ pub struct UpdateMessageRequest {
 // Job models
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Job {
-    pub character: String,
-    pub prompt: String,
+    pub characters: Vec<String>,
+    pub prompts: Vec<String>,
     pub cadence: String,
     #[serde(rename = "prompt-override")]
     pub prompt_override: Option<String>,
@@ -240,8 +240,8 @@ pub struct Job {
 // Job CRUD request/response models
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateJobRequest {
-    pub character: String,
-    pub prompt: String,
+    pub characters: Vec<String>,
+    pub prompts: Vec<String>,
     pub cadence: String,
     #[serde(rename = "prompt-override")]
     pub prompt_override: Option<String>,
@@ -249,8 +249,8 @@ pub struct CreateJobRequest {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateJobRequest {
-    pub character: String,
-    pub prompt: String,
+    pub characters: Vec<String>,
+    pub prompts: Vec<String>,
     pub cadence: String,
     #[serde(rename = "prompt-override")]
     pub prompt_override: Option<String>,

@@ -1,20 +1,20 @@
 export interface Job {
-	character: string;
-	prompt: string;
+	characters: string[];
+	prompts: string[];
 	cadence: string;
 	'prompt-override': string | null;
 }
 
 export interface CreateJobRequest {
-	character: string;
-	prompt: string;
+	characters: string[];
+	prompts: string[];
 	cadence: string;
 	'prompt-override': string | null;
 }
 
 export interface UpdateJobRequest {
-	character: string;
-	prompt: string;
+	characters: string[];
+	prompts: string[];
 	cadence: string;
 	'prompt-override': string | null;
 }

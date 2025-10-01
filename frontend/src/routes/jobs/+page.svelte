@@ -90,7 +90,8 @@
 		try {
 			isSubmitting = true;
 			error = null;
-			await deleteJob(job.character, job.prompt);
+			// Use the first character and prompt for the deletion API (we'll need to update this later)
+			await deleteJob(job.characters[0] || '', job.prompts[0] || '');
 			await loadJobs(); // Reload the list
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to delete job';
@@ -101,7 +102,7 @@
 	}
 
 	async function handleExecuteJob(job: Job) {
-		const jobId = `${job.character}-${job.prompt}`;
+		const jobId = `${job.characters.join(',')}-${job.prompts.join(',')}`;
 		try {
 			_executingJobId = jobId;
 			error = null;
@@ -117,7 +118,7 @@
 	}
 
 	async function handleTestJob2(job: Job) {
-		const jobId = `${job.character}-${job.prompt}`;
+		const jobId = `${job.characters.join(',')}-${job.prompts.join(',')}`;
 		try {
 			_executingJobId = jobId;
 			error = null;
@@ -137,8 +138,8 @@
 			error = null;
 			// Convert CreateJobRequest to Job for testing (without saving to chat history)
 			const testJob: Job = {
-				character: jobData.character,
-				prompt: jobData.prompt,
+				characters: jobData.characters,
+				prompts: jobData.prompts,
 				cadence: jobData.cadence,
 				'prompt-override': jobData['prompt-override']
 			};
@@ -159,12 +160,13 @@
 			if (editingJob) {
 				// Update existing job
 				const updates: UpdateJobRequest = {
-					character: jobData.character,
-					prompt: jobData.prompt,
+					characters: jobData.characters,
+					prompts: jobData.prompts,
 					cadence: jobData.cadence,
 					'prompt-override': jobData['prompt-override']
 				};
-				await updateJob(editingJob.character, editingJob.prompt, updates);
+				// Use the first character and prompt for the update API (we'll need to update this later)
+				await updateJob(editingJob.characters[0] || '', editingJob.prompts[0] || '', updates);
 			} else {
 				// Create new job
 				await createJob(jobData);

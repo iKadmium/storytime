@@ -225,8 +225,8 @@ mod tests {
 
     fn create_test_job() -> Job {
         Job {
-            character: "Test Knight".to_string(),
-            prompt: "Test Prompt".to_string(),
+            characters: vec!["Test Knight".to_string()],
+            prompts: vec!["Test Prompt".to_string()],
             cadence: "daily".to_string(),
             prompt_override: None,
         }

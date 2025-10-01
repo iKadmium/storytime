@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { CreateJobRequest, Job } from '$lib/models/job.js';
 	import Button from '$lib/components/Button/Button.svelte';
+	import MultiSelect from '$lib/components/MultiSelect/MultiSelect.svelte';
 	import { formatCadence } from '$lib/utils/cron';
 
 	interface Props {
@@ -17,25 +18,25 @@
 	let { job, onSubmit, onCancel, onTest, isSubmitting = false, submitLabel = 'Create Job', availableCharacters = [], availablePrompts = [] }: Props = $props();
 
 	// Form fields
-	let character = $state(job?.character || '');
-	let prompt = $state(job?.prompt || '');
+	let characters = $state(job?.characters || []);
+	let prompts = $state(job?.prompts || []);
 	let cadence = $state(job?.cadence || '');
 	let promptOverride = $state(job?.['prompt-override'] || '');
 	let usePromptOverride = $state(!!job?.['prompt-override']);
 
 	// Validation state
-	let characterError = $state('');
-	let promptError = $state('');
+	let charactersError = $state('');
+	let promptsError = $state('');
 	let cadenceError = $state('');
 	let promptOverrideError = $state('');
 
 	let cadencePlain = $derived(formatCadence(cadence));
 
 	function handleTest() {
-		if (onTest && character.trim() && prompt.trim()) {
+		if (onTest && characters.length > 0 && prompts.length > 0) {
 			const testJob: CreateJobRequest = {
-				character: character.trim(),
-				prompt: prompt.trim(),
+				characters: characters,
+				prompts: prompts,
 				cadence: cadence.trim() || '0 0 * * *', // Default cadence for testing
 				'prompt-override': usePromptOverride ? promptOverride.trim() || null : null
 			};
@@ -47,20 +48,20 @@
 		let isValid = true;
 
 		// Reset errors
-		characterError = '';
-		promptError = '';
+		charactersError = '';
+		promptsError = '';
 		cadenceError = '';
 		promptOverrideError = '';
 
-		// Character validation
-		if (!character.trim()) {
-			characterError = 'Character is required';
+		// Characters validation
+		if (characters.length === 0) {
+			charactersError = 'At least one character is required';
 			isValid = false;
 		}
 
-		// Prompt validation
-		if (!prompt.trim()) {
-			promptError = 'Prompt is required';
+		// Prompts validation
+		if (prompts.length === 0) {
+			promptsError = 'At least one prompt is required';
 			isValid = false;
 		}
 
@@ -93,8 +94,8 @@
 		}
 
 		const jobData: CreateJobRequest = {
-			character: character.trim(),
-			prompt: prompt.trim(),
+			characters: characters,
+			prompts: prompts,
 			cadence: cadence.trim(),
 			'prompt-override': usePromptOverride ? promptOverride.trim() : null
 		};
@@ -105,60 +106,28 @@
 
 <form class="space-y-4" onsubmit={handleSubmit}>
 	<!-- Character Field -->
-	<div class="form-group">
-		<label class="label" for="character">
-			<span>Character <span class="text-red-500">*</span></span>
-		</label>
-		{#if availableCharacters.length > 0}
-			<select id="character" class="select" class:input-error={characterError} bind:value={character} disabled={isSubmitting}>
-				<option value="">Select a character...</option>
-				{#each availableCharacters as char, index (index)}
-					<option value={char}>{char}</option>
-				{/each}
-			</select>
-		{:else}
-			<input
-				id="character"
-				type="text"
-				class="input"
-				class:input-error={characterError}
-				bind:value={character}
-				placeholder="Enter character name"
-				disabled={isSubmitting}
-			/>
-		{/if}
-		{#if characterError}
-			<div class="mt-1 text-sm text-error-500">{characterError}</div>
-		{/if}
-	</div>
+	<MultiSelect
+		label="Characters"
+		bind:selected={characters}
+		options={availableCharacters}
+		placeholder="Select characters..."
+		required={true}
+		disabled={isSubmitting}
+		error={charactersError}
+		minItems={1}
+	/>
 
 	<!-- Prompt Field -->
-	<div class="form-group">
-		<label class="label" for="prompt">
-			<span>Prompt <span class="text-red-500">*</span></span>
-		</label>
-		{#if availablePrompts.length > 0}
-			<select id="prompt" class="select" class:input-error={promptError} bind:value={prompt} disabled={isSubmitting}>
-				<option value="">Select a prompt...</option>
-				{#each availablePrompts as promptOption, index (index)}
-					<option value={promptOption}>{promptOption}</option>
-				{/each}
-			</select>
-		{:else}
-			<input
-				id="prompt"
-				type="text"
-				class="input"
-				class:input-error={promptError}
-				bind:value={prompt}
-				placeholder="Enter prompt name"
-				disabled={isSubmitting}
-			/>
-		{/if}
-		{#if promptError}
-			<div class="mt-1 text-sm text-error-500">{promptError}</div>
-		{/if}
-	</div>
+	<MultiSelect
+		label="Prompts"
+		bind:selected={prompts}
+		options={availablePrompts}
+		placeholder="Select prompts..."
+		required={true}
+		disabled={isSubmitting}
+		error={promptsError}
+		minItems={1}
+	/>
 
 	<!-- Cadence Field -->
 	<div class="form-group">
@@ -220,7 +189,7 @@
 	<div class="flex justify-end space-x-2 pt-4">
 		<Button type="button" preset="ghost" onclick={onCancel} disabled={isSubmitting}>Cancel</Button>
 		{#if onTest}
-			<Button type="button" preset="outlined" color="secondary" onclick={handleTest} disabled={isSubmitting || !character.trim() || !prompt.trim()}>
+			<Button type="button" preset="outlined" color="secondary" onclick={handleTest} disabled={isSubmitting || characters.length === 0 || prompts.length === 0}>
 				Test
 			</Button>
 		{/if}
