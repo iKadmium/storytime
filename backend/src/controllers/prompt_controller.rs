@@ -2,7 +2,7 @@ use axum::{Json as JsonExtract, extract::Path, http::StatusCode, response::Json}
 use tokio::fs;
 
 use crate::models::{ApiResponse, CreatePromptRequest, Prompt, UpdatePromptRequest};
-use crate::utils::{prompt_slug, prompt_file_path};
+use crate::utils::{prompt_file_path, prompt_slug};
 
 /// Get all prompts
 pub async fn get_prompts()
@@ -38,7 +38,9 @@ pub async fn get_prompt(
             message: "Prompt retrieved successfully".to_string(),
         })),
         Err(e) => {
-            if e.to_string().contains("No such file or directory") || e.to_string().contains("Prompt not found") {
+            if e.to_string().contains("No such file or directory")
+                || e.to_string().contains("Prompt not found")
+            {
                 Err((
                     StatusCode::NOT_FOUND,
                     Json(ApiResponse {
@@ -104,7 +106,9 @@ pub async fn update_prompt(
     let mut prompt = match load_prompt_by_slug(&slug).await {
         Ok(prompt) => prompt,
         Err(e) => {
-            if e.to_string().contains("No such file or directory") || e.to_string().contains("Prompt not found") {
+            if e.to_string().contains("No such file or directory")
+                || e.to_string().contains("Prompt not found")
+            {
                 return Err((
                     StatusCode::NOT_FOUND,
                     Json(ApiResponse {
@@ -245,18 +249,19 @@ async fn load_all_prompts() -> Result<Vec<Prompt>, Box<dyn std::error::Error + S
     Ok(prompts)
 }
 
-
 /// Load a specific prompt by slug
 /// This searches all prompts to find one whose title converts to the given slug
-async fn load_prompt_by_slug(slug: &str) -> Result<Prompt, Box<dyn std::error::Error + Send + Sync>> {
+async fn load_prompt_by_slug(
+    slug: &str,
+) -> Result<Prompt, Box<dyn std::error::Error + Send + Sync>> {
     let prompts = load_all_prompts().await?;
-    
+
     for prompt in prompts {
         if prompt_slug(&prompt.title) == slug {
             return Ok(prompt);
         }
     }
-    
+
     Err(format!("Prompt not found with slug: {slug}").into())
 }
 
@@ -274,7 +279,3 @@ async fn delete_prompt_file(title: &str) -> Result<(), Box<dyn std::error::Error
     fs::remove_file(path).await?;
     Ok(())
 }
-
-
-
-

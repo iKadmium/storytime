@@ -1,8 +1,4 @@
-use axum::{
-    extract::Path,
-    http::StatusCode,
-    response::Json,
-};
+use axum::{extract::Path, http::StatusCode, response::Json};
 
 use crate::models::{ApiResponse, HealthResponse};
 
