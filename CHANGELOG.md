@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.2](https://github.com/iKadmium/storytime/compare/v1.1.1...v1.1.2) (2025-10-01)
+
+
+### Bug Fixes
+
+* API Base URL for chats ([24dd692](https://github.com/iKadmium/storytime/commit/24dd692be57d625313f3e5520830cdc56e138024))
+* fix max length for llms ([6993703](https://github.com/iKadmium/storytime/commit/69937038f21869d8c626f24626218f30069d4907))
+
+
+### Miscellaneous
+
+* add workflow call for docker ([843cf2a](https://github.com/iKadmium/storytime/commit/843cf2a6eea3fcd60780fb8ad33c29a55950cd6e))
+* Make docker image independant ([c53ed44](https://github.com/iKadmium/storytime/commit/c53ed44d913240fa7f546bb1ae8c5ffd17ef5dea))
+
 ## [1.1.1](https://github.com/iKadmium/storytime/compare/v1.1.0...v1.1.1) (2025-10-01)
 
 
