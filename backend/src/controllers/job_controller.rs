@@ -595,11 +595,9 @@ async fn run_job_with_character_and_prompt(
         execute_ai_services(&job, &character, &prompt, settings, save_to_chat_history).await?;
 
     // Optionally save the message to chat history
-    if save_to_chat_history {
-        if let Err(e) = save_message_to_chat(&job.character, &message).await {
-            tracing::warn!("Failed to save message to chat history: {}", e);
-            // Don't fail the entire operation if we can't save to chat history
-        }
+    if save_to_chat_history && let Err(e) = save_message_to_chat(&job.character, &message).await {
+        tracing::warn!("Failed to save message to chat history: {}", e);
+        // Don't fail the entire operation if we can't save to chat history
     }
 
     Ok(Json(ApiResponse {

@@ -455,11 +455,11 @@ async fn load_all_chat_names() -> Result<Vec<String>, Box<dyn std::error::Error 
     let mut chat_names = Vec::new();
 
     while let Some(entry) = entries.next_entry().await? {
-        if let Some(file_name) = entry.file_name().to_str() {
-            if file_name.ends_with(".json") {
-                let character_name = file_name.trim_end_matches(".json").to_string();
-                chat_names.push(character_name);
-            }
+        if let Some(file_name) = entry.file_name().to_str()
+            && file_name.ends_with(".json")
+        {
+            let character_name = file_name.trim_end_matches(".json").to_string();
+            chat_names.push(character_name);
         }
     }
 
