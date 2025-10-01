@@ -7,6 +7,10 @@ on:
       - '**.md'
       - 'LICENSE'
 
+permissions:
+  contents: write
+  pull-requests: write
+
 env:
   CARGO_TERM_COLOR: always
   REGISTRY: ghcr.io
