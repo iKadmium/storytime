@@ -27,36 +27,34 @@
 		deleteLabel="Delete Prompt"
 		testLabel="Test Prompt"
 	>
-		{#snippet children()}
-			<FieldDisplay
-				fields={[
-					{
-						icon: '📝',
-						label: 'Description',
-						value: prompt.description
-					},
-					{
-						icon: '🎬',
-						label: 'Context',
-						value: prompt.context
-					},
-					{
-						icon: '⚙️',
-						label: 'Setup',
-						value: '• ' + prompt.setup.join('\n• ')
-					},
-					{
-						icon: '🎵',
-						label: 'Create Audio',
-						value: (prompt.create_audio ?? false) ? 'Yes' : 'No'
-					},
-					{
-						icon: '🖼️',
-						label: 'Create Images',
-						value: (prompt.create_images ?? false) ? 'Yes' : 'No'
-					}
-				]}
-			/>
-		{/snippet}
+		<FieldDisplay
+			fields={[
+				{
+					icon: '📝',
+					label: 'Description',
+					value: prompt.description
+				},
+				{
+					icon: '🎬',
+					label: 'Context',
+					value: prompt.context
+				},
+				{
+					icon: '⚙️',
+					label: 'Setup',
+					value: '• ' + prompt.setup.join('\n• ')
+				},
+				{
+					icon: '🎵',
+					label: 'Create Audio',
+					value: (prompt.create_audio ?? false) ? 'Yes' : 'No'
+				},
+				{
+					icon: '🖼️',
+					label: 'Create Images',
+					value: (prompt.create_images ?? false) ? 'Yes' : 'No'
+				}
+			]}
+		/>
 	</DetailModal>
 {/if}

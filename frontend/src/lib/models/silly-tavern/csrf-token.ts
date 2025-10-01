@@ -1,3 +1,3 @@
 export interface CsrfTokenResponse {
-    token: string;
+	token: string;
 }

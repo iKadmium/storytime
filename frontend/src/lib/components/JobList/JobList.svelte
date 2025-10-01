@@ -2,6 +2,7 @@
 	import type { Job } from '$lib/models/job.js';
 	import ItemCard from '$lib/components/ItemCard/ItemCard.svelte';
 	import ItemListCard from '$lib/components/ItemListCard/ItemListCard.svelte';
+	import { formatCadence } from '$lib/utils/cron';
 
 	interface Props {
 		jobs: Job[];
@@ -13,15 +14,7 @@
 		generateFilename: (character: string, prompt: string) => string;
 	}
 
-	let {
-		jobs,
-		onEdit,
-		onDelete,
-		onView,
-		onExecute,
-		isLoading = false,
-		generateFilename
-	}: Props = $props();
+	let { jobs, onEdit, onDelete, onView, onExecute, isLoading = false, generateFilename }: Props = $props();
 
 	function handleEdit(job: Job) {
 		const filename = generateFilename(job.character, job.prompt);
@@ -41,32 +34,6 @@
 		if (onExecute) {
 			onExecute(job);
 		}
-	}
-
-	function formatCadence(cadence: string): string {
-		// Simple cron expression formatter for display
-		const parts = cadence.split(' ');
-		if (parts.length === 5) {
-			const [min, hour, day, month, dow] = parts;
-
-			// Format day of week
-			let dowDisplay = dow;
-			if (dow === '1-5') dowDisplay = 'Weekdays';
-			else if (dow === '0,6') dowDisplay = 'Weekends';
-			else if (dow === '*') dowDisplay = 'Daily';
-
-			// Format time
-			let timeDisplay = '';
-			if (hour.includes(',')) {
-				const hours = hour.split(',');
-				timeDisplay = hours.map((h) => `${h}:${min.padStart(2, '0')}`).join(', ');
-			} else if (hour !== '*') {
-				timeDisplay = `${hour}:${min.padStart(2, '0')}`;
-			}
-
-			return timeDisplay && dowDisplay !== 'Daily' ? `${timeDisplay} on ${dowDisplay}` : cadence;
-		}
-		return cadence;
 	}
 </script>
 

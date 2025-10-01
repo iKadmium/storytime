@@ -1,5 +1,5 @@
 use crate::chatml::ChatMLPrompt;
-use crate::models::{Character, Chat, Job, Prompt, Voice};
+use crate::models::{Character, Chat, Job, Prompt};
 
 /// Builds a ChatML prompt for a single setup item
 /// Used for iterative LLM calls where each setup item results in a separate call
@@ -190,6 +190,7 @@ pub fn build_simple_prompt(_job: &Job, character: &Character, prompt: &Prompt) -
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::models::Voice;
 
     fn create_test_character() -> Character {
         Character {

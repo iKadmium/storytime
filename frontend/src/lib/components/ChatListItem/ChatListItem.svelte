@@ -23,11 +23,7 @@
 	}
 </script>
 
-<a
-	href="/chats/{encodeURIComponent(characterToSlug(chat.character))}"
-	class="chat-list-item"
-	class:selected={isSelected}
->
+<a href="/chats/{encodeURIComponent(characterToSlug(chat.character))}" class="chat-list-item" class:selected={isSelected}>
 	<div class="avatar">
 		<span class="avatar-text">{getInitials(chat.character)}</span>
 	</div>

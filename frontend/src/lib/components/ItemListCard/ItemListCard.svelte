@@ -13,17 +13,7 @@
 		onExecute?: () => void;
 	}
 
-	let {
-		title,
-		description,
-		badge,
-		badgeColor = 'secondary',
-		executeLabel = 'Execute',
-		onView,
-		onEdit,
-		onDelete,
-		onExecute
-	}: Props = $props();
+	let { title, description, badge, badgeColor = 'secondary', executeLabel = 'Execute', onView, onEdit, onDelete, onExecute }: Props = $props();
 
 	function truncateText(text: string, maxLength: number = 100): string {
 		if (text.length <= maxLength) return text;
@@ -31,7 +21,7 @@
 	}
 </script>
 
-<div class="card preset-glass-surface flex flex-col">
+<div class="preset-glass-surface flex flex-col card">
 	<div class="flex-1 p-4">
 		<div class="mb-3 flex items-start justify-between">
 			<div>
@@ -40,21 +30,9 @@
 					<span class="chip preset-soft-{badgeColor} text-xs">{badge}</span>
 				{/if}
 			</div>
-			<Button
-				onclick={onView}
-				preset="ghost-icon"
-				color="primary"
-				size="sm"
-				type="button"
-				aria-label={`View ${title} details`}
-			>
+			<Button onclick={onView} preset="ghost-icon" color="primary" size="sm" type="button" aria-label={`View ${title} details`}>
 				<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						stroke-width="2"
-						d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-					></path>
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
 					<path
 						stroke-linecap="round"
 						stroke-linejoin="round"
@@ -70,12 +48,10 @@
 		</p>
 	</div>
 
-	<footer class="border-surface-500/20 border-t p-3">
+	<footer class="border-t border-surface-500/20 p-3">
 		<div class="flex justify-end gap-2">
 			{#if onExecute}
-				<Button size="sm" preset="outlined" color="primary" onclick={onExecute}
-					>{executeLabel}</Button
-				>
+				<Button size="sm" preset="outlined" color="primary" onclick={onExecute}>{executeLabel}</Button>
 			{/if}
 			<Button size="sm" preset="outlined" onclick={onEdit}>Edit</Button>
 			<Button size="sm" preset="outlined" color="error" onclick={onDelete}>Delete</Button>

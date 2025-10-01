@@ -7,6 +7,7 @@
 
 * Use SvelteKit 5 with TypeScript. Use only Runes.
 * Use Skeleton UI components and tailwind.
+* Use pnpm as package manager.
 
 # Backend
 

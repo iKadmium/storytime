@@ -9,12 +9,7 @@
 
 	import type { Prompt, CreatePromptRequest, UpdatePromptRequest } from '$lib/models/prompt';
 	import type { Message } from '$lib/models/chat';
-	import {
-		fetchPrompts,
-		createPrompt,
-		updatePrompt,
-		deletePrompt
-	} from '$lib/services/prompt-service';
+	import { fetchPrompts, createPrompt, updatePrompt, deletePrompt } from '$lib/services/prompt-service';
 	import { testPromptWithCharacter } from '$lib/services/test-service';
 	import { fetchCharacters } from '$lib/services/character-service';
 	import { isBase64Audio, convertTestAudioToUrl } from '$lib/services/chat-service';
@@ -91,9 +86,7 @@
 	}
 
 	async function handleDelete(prompt: Prompt) {
-		const confirmed = confirm(
-			`Are you sure you want to delete "${prompt.title}"? This action cannot be undone.`
-		);
+		const confirmed = confirm(`Are you sure you want to delete "${prompt.title}"? This action cannot be undone.`);
 		if (!confirmed) return;
 
 		try {
@@ -253,10 +246,8 @@
 	<!-- Header -->
 	<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 		<div>
-			<h1 class="h1 gradient-heading">Prompts</h1>
-			<p class="opacity-75">
-				Manage your story prompts with detailed context and setup instructions.
-			</p>
+			<h1 class="gradient-heading h1">Prompts</h1>
+			<p class="opacity-75">Manage your story prompts with detailed context and setup instructions.</p>
 		</div>
 
 		{#if !showForm}
@@ -272,9 +263,7 @@
 				<p>{error}</p>
 			</div>
 			<div class="alert-actions">
-				<Button size="sm" preset="ghost" color="error" onclick={() => (error = null)}>
-					Dismiss
-				</Button>
+				<Button size="sm" preset="ghost" color="error" onclick={() => (error = null)}>Dismiss</Button>
 			</div>
 		</aside>
 	{/if}
@@ -296,14 +285,7 @@
 
 	<!-- Prompt List -->
 	{#if !showForm}
-		<PromptList
-			{prompts}
-			onEdit={handleEdit}
-			onDelete={handleDelete}
-			onView={handleView}
-			onTest={handleTestPrompt}
-			{isLoading}
-		/>
+		<PromptList {prompts} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} onTest={handleTestPrompt} {isLoading} />
 	{/if}
 
 	<!-- Refresh Button -->
@@ -343,65 +325,57 @@
 	}}
 	title="Prompt Test Result"
 >
-	{#snippet children()}
-		{#if testResult}
-			<div class="space-y-4">
-				<div>
-					<h4 class="h4 mb-2">Generated Text:</h4>
-					{#each testResult.text as textItem}
-						<p class="bg-surface-200-800 mb-2 rounded p-3 text-sm">{textItem}</p>
-					{/each}
-				</div>
-
-				{#if processedAudioUrls && processedAudioUrls.length > 0}
-					<div>
-						<h4 class="h4 mb-2">Generated Audio:</h4>
-
-						<div class="space-y-3">
-							{#each processedAudioUrls as audioUrl, index}
-								{@const isBase64Source = testResult && isBase64Audio(testResult.audio[index])}
-								<div class="audio-player">
-									{#if isBase64Source}
-										<div class="text-surface-600 mb-1 text-xs font-medium uppercase tracking-wide">
-											Test Generated Audio
-										</div>
-									{:else}
-										<div class="text-surface-600 mb-1 text-xs font-medium uppercase tracking-wide">
-											Audio File: {testResult.audio[index]}
-										</div>
-									{/if}
-
-									<audio controls class="w-full max-w-md">
-										<source src={audioUrl} type={isBase64Source ? 'audio/mp3' : ''} />
-										{#if isBase64Source}
-											<div class="text-error-500 p-2 text-sm">
-												Audio format not supported by your browser
-											</div>
-										{:else}
-											<div class="text-surface-500 p-2 text-sm">
-												Your browser does not support the audio element
-											</div>
-										{/if}
-									</audio>
-								</div>
-							{/each}
-						</div>
-					</div>
-				{/if}
-
-				{#if testResult.images && testResult.images.length > 0}
-					<div>
-						<h4 class="h4 mb-2">Image Files:</h4>
-						<ul class="list-inside list-disc text-sm">
-							{#each testResult.images as imageFile}
-								<li>{imageFile}</li>
-							{/each}
-						</ul>
-					</div>
-				{/if}
+	{#if testResult}
+		<div class="space-y-4">
+			<div>
+				<h4 class="mb-2 h4">Generated Text:</h4>
+				{#each testResult.text as textItem, index (index)}
+					<p class="mb-2 rounded bg-surface-200-800 p-3 text-sm">{textItem}</p>
+				{/each}
 			</div>
-		{/if}
-	{/snippet}
+
+			{#if processedAudioUrls && processedAudioUrls.length > 0}
+				<div>
+					<h4 class="mb-2 h4">Generated Audio:</h4>
+
+					<div class="space-y-3">
+						{#each processedAudioUrls as audioUrl, index (index)}
+							{@const isBase64Source = testResult && isBase64Audio(testResult.audio[index])}
+							<div class="audio-player">
+								{#if isBase64Source}
+									<div class="mb-1 text-xs font-medium tracking-wide text-surface-600 uppercase">Test Generated Audio</div>
+								{:else}
+									<div class="mb-1 text-xs font-medium tracking-wide text-surface-600 uppercase">
+										Audio File: {testResult.audio[index]}
+									</div>
+								{/if}
+
+								<audio controls class="w-full max-w-md">
+									<source src={audioUrl} type={isBase64Source ? 'audio/mp3' : ''} />
+									{#if isBase64Source}
+										<div class="p-2 text-sm text-error-500">Audio format not supported by your browser</div>
+									{:else}
+										<div class="p-2 text-sm text-surface-500">Your browser does not support the audio element</div>
+									{/if}
+								</audio>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+
+			{#if testResult.images && testResult.images.length > 0}
+				<div>
+					<h4 class="mb-2 h4">Image Files:</h4>
+					<ul class="list-inside list-disc text-sm">
+						{#each testResult.images as imageFile, index (index)}
+							<li>{imageFile}</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
+		</div>
+	{/if}
 </DetailModal>
 
 <style>

@@ -11,17 +11,7 @@
 		maxlength?: number;
 	}
 
-	let {
-		label,
-		value = $bindable(),
-		onInput,
-		placeholder = '',
-		required = false,
-		disabled = false,
-		error = '',
-		rows = 3,
-		maxlength
-	}: Props = $props();
+	let { label, value = $bindable(), onInput, placeholder = '', required = false, disabled = false, error = '', rows = 3, maxlength }: Props = $props();
 
 	function handleInput(event: Event) {
 		const target = event.target as HTMLTextAreaElement;
@@ -34,16 +24,7 @@
 		{label}
 		{#if required}<span class="text-error-500">*</span>{/if}
 	</span>
-	<textarea
-		class="textarea"
-		bind:value
-		oninput={handleInput}
-		{disabled}
-		{placeholder}
-		{required}
-		{rows}
-		{maxlength}
-	></textarea>
+	<textarea class="textarea" bind:value oninput={handleInput} {disabled} {placeholder} {required} {rows} {maxlength}></textarea>
 	{#if error}
 		<small class="text-error-500">{error}</small>
 	{/if}

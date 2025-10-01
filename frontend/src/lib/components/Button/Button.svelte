@@ -2,27 +2,12 @@
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLButtonAttributes {
-		preset?:
-			| 'filled'
-			| 'tonal'
-			| 'outlined'
-			| 'glass'
-			| 'elevated'
-			| 'ghost'
-			| 'ghost-icon'
-			| 'gradient';
+		preset?: 'filled' | 'tonal' | 'outlined' | 'glass' | 'elevated' | 'ghost' | 'ghost-icon' | 'gradient';
 		color?: 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'error' | 'surface';
 		size?: 'sm' | 'base' | 'lg';
 	}
 
-	let {
-		preset = 'filled',
-		color = 'primary',
-		size = 'base',
-		class: className = '',
-		children,
-		...restProps
-	}: Props = $props();
+	let { preset = 'filled', color = 'primary', size = 'base', class: className = '', children, ...restProps }: Props = $props();
 
 	const sizeClasses = {
 		sm: 'btn-sm',

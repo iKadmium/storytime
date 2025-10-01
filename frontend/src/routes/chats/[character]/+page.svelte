@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
-	import type { Chat, Message } from '$lib/models/chat';
 	import type { ChatListItem as ChatListItemType } from '$lib/models/chat';
 	import ChatListItem from '$lib/components/ChatListItem/ChatListItem.svelte';
 	import { getChatListItems } from '$lib/services/chat-service';
@@ -108,7 +107,7 @@
 
 								{#if message.audio.length > 0}
 									<div class="message-audio">
-										{#each message.audio as audioId}
+										{#each message.audio as audioId, index (index)}
 											{@const audioUrl = `/audio/${encodeURIComponent(toSlug(chat.character))}/${audioId}.mp3`}
 											<audio controls>
 												<source src={audioUrl} type="audio/mpeg" />
@@ -120,7 +119,7 @@
 
 								{#if message.images.length > 0}
 									<div class="message-images">
-										{#each message.images as imageFile}
+										{#each message.images as imageFile, index (index)}
 											<img src={imageFile} alt="Message attachment" />
 										{/each}
 									</div>

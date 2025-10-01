@@ -4,18 +4,18 @@ import { error } from '@sveltejs/kit';
 import { slugToCharacter } from '$lib/utils/character-url';
 
 export const load: PageLoad = async ({ params }) => {
-    try {
-        // Convert URL slug back to original character name format
-        const originalCharacterName = slugToCharacter(params.character);
+	try {
+		// Convert URL slug back to original character name format
+		const originalCharacterName = slugToCharacter(params.character);
 
-        const chat = await getChat(params.character);
-        return {
-            chat,
-            character: originalCharacterName,
-            urlCharacter: params.character
-        };
-    } catch (e) {
-        console.error('Failed to load chat:', e);
-        throw error(404, `Chat with character "${params.character}" not found`);
-    }
+		const chat = await getChat(params.character);
+		return {
+			chat,
+			character: originalCharacterName,
+			urlCharacter: params.character
+		};
+	} catch (e) {
+		console.error('Failed to load chat:', e);
+		throw error(404, `Chat with character "${params.character}" not found`);
+	}
 };

@@ -10,14 +10,7 @@
 		placeholder?: string;
 	}
 
-	let {
-		title,
-		isOpen,
-		onClose,
-		onSelect,
-		options,
-		placeholder = 'Select an option'
-	}: Props = $props();
+	let { title, isOpen, onClose, onSelect, options, placeholder = 'Select an option' }: Props = $props();
 
 	let selectedOption = $state('');
 
@@ -52,12 +45,11 @@
 		aria-labelledby="modal-title"
 		tabindex="-1"
 	>
-		<div
-			class="card preset-filled-surface-50-950 w-full max-w-md overflow-hidden"
-			onclick={(e) => e.stopPropagation()}
-		>
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<div class="w-full max-w-md overflow-hidden card preset-filled-surface-50-950" onclick={(e) => e.stopPropagation()}>
 			<!-- Header -->
-			<header class="border-surface-500/20 border-b p-4">
+			<header class="border-b border-surface-500/20 p-4">
 				<h2 id="modal-title" class="h2">{title}</h2>
 			</header>
 
@@ -69,7 +61,7 @@
 					</label>
 					<select id="selection" bind:value={selectedOption} class="select" required>
 						<option value="">-- Select --</option>
-						{#each options as option}
+						{#each options as option, index (index)}
 							<option value={option}>{option}</option>
 						{/each}
 					</select>

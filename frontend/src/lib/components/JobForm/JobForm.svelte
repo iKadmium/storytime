@@ -13,16 +13,7 @@
 		availablePrompts?: string[];
 	}
 
-	let {
-		job,
-		onSubmit,
-		onCancel,
-		onTest,
-		isSubmitting = false,
-		submitLabel = 'Create Job',
-		availableCharacters = [],
-		availablePrompts = []
-	}: Props = $props();
+	let { job, onSubmit, onCancel, onTest, isSubmitting = false, submitLabel = 'Create Job', availableCharacters = [], availablePrompts = [] }: Props = $props();
 
 	// Form fields
 	let character = $state(job?.character || '');
@@ -116,15 +107,9 @@
 			<span>Character <span class="text-red-500">*</span></span>
 		</label>
 		{#if availableCharacters.length > 0}
-			<select
-				id="character"
-				class="select"
-				class:input-error={characterError}
-				bind:value={character}
-				disabled={isSubmitting}
-			>
+			<select id="character" class="select" class:input-error={characterError} bind:value={character} disabled={isSubmitting}>
 				<option value="">Select a character...</option>
-				{#each availableCharacters as char}
+				{#each availableCharacters as char, index (index)}
 					<option value={char}>{char}</option>
 				{/each}
 			</select>
@@ -140,7 +125,7 @@
 			/>
 		{/if}
 		{#if characterError}
-			<div class="text-error-500 mt-1 text-sm">{characterError}</div>
+			<div class="mt-1 text-sm text-error-500">{characterError}</div>
 		{/if}
 	</div>
 
@@ -150,15 +135,9 @@
 			<span>Prompt <span class="text-red-500">*</span></span>
 		</label>
 		{#if availablePrompts.length > 0}
-			<select
-				id="prompt"
-				class="select"
-				class:input-error={promptError}
-				bind:value={prompt}
-				disabled={isSubmitting}
-			>
+			<select id="prompt" class="select" class:input-error={promptError} bind:value={prompt} disabled={isSubmitting}>
 				<option value="">Select a prompt...</option>
-				{#each availablePrompts as promptOption}
+				{#each availablePrompts as promptOption, index (index)}
 					<option value={promptOption}>{promptOption}</option>
 				{/each}
 			</select>
@@ -174,7 +153,7 @@
 			/>
 		{/if}
 		{#if promptError}
-			<div class="text-error-500 mt-1 text-sm">{promptError}</div>
+			<div class="mt-1 text-sm text-error-500">{promptError}</div>
 		{/if}
 	</div>
 
@@ -193,11 +172,10 @@
 			disabled={isSubmitting}
 		/>
 		{#if cadenceError}
-			<div class="text-error-500 mt-1 text-sm">{cadenceError}</div>
+			<div class="mt-1 text-sm text-error-500">{cadenceError}</div>
 		{:else}
-			<div class="text-surface-500 mt-1 text-sm">
-				Format: minute hour day month day-of-week (e.g., "30 9,10,11 * * 1-5" = 9:30, 10:30, 11:30
-				AM on weekdays)
+			<div class="mt-1 text-sm text-surface-500">
+				Format: minute hour day month day-of-week (e.g., "30 9,10,11 * * 1-5" = 9:30, 10:30, 11:30 AM on weekdays)
 			</div>
 		{/if}
 	</div>
@@ -205,17 +183,10 @@
 	<!-- Prompt Override Checkbox -->
 	<div class="form-group">
 		<label class="flex items-center space-x-2">
-			<input
-				type="checkbox"
-				class="checkbox"
-				bind:checked={usePromptOverride}
-				disabled={isSubmitting}
-			/>
+			<input type="checkbox" class="checkbox" bind:checked={usePromptOverride} disabled={isSubmitting} />
 			<span>Use custom prompt override</span>
 		</label>
-		<div class="text-surface-500 mt-1 text-sm">
-			Enable this to override the default prompt template for this specific job
-		</div>
+		<div class="mt-1 text-sm text-surface-500">Enable this to override the default prompt template for this specific job</div>
 	</div>
 
 	<!-- Prompt Override Field (only shown when checkbox is checked) -->
@@ -234,11 +205,9 @@
 				disabled={isSubmitting}
 			></textarea>
 			{#if promptOverrideError}
-				<div class="text-error-500 mt-1 text-sm">{promptOverrideError}</div>
+				<div class="mt-1 text-sm text-error-500">{promptOverrideError}</div>
 			{:else}
-				<div class="text-surface-500 mt-1 text-sm">
-					This text will override the default prompt template for this specific job
-				</div>
+				<div class="mt-1 text-sm text-surface-500">This text will override the default prompt template for this specific job</div>
 			{/if}
 		</div>
 	{/if}
@@ -247,13 +216,7 @@
 	<div class="flex justify-end space-x-2 pt-4">
 		<Button type="button" preset="ghost" onclick={onCancel} disabled={isSubmitting}>Cancel</Button>
 		{#if onTest}
-			<Button
-				type="button"
-				preset="outlined"
-				color="secondary"
-				onclick={handleTest}
-				disabled={isSubmitting || !character.trim() || !prompt.trim()}
-			>
+			<Button type="button" preset="outlined" color="secondary" onclick={handleTest} disabled={isSubmitting || !character.trim() || !prompt.trim()}>
 				Test
 			</Button>
 		{/if}

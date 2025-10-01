@@ -7,18 +7,9 @@
 	import SelectionModal from '$lib/components/SelectionModal/SelectionModal.svelte';
 	import DetailModal from '$lib/components/DetailModal/DetailModal.svelte';
 
-	import type {
-		Character,
-		CreateCharacterRequest,
-		UpdateCharacterRequest
-	} from '$lib/models/character';
+	import type { Character, CreateCharacterRequest, UpdateCharacterRequest } from '$lib/models/character';
 	import type { Message } from '$lib/models/chat';
-	import {
-		fetchCharacters,
-		createCharacter,
-		updateCharacter,
-		deleteCharacter
-	} from '$lib/services/character-service';
+	import { fetchCharacters, createCharacter, updateCharacter, deleteCharacter } from '$lib/services/character-service';
 	import { getReferenceFiles } from '$lib/services/chatterbox-service';
 	import { testCharacterWithPrompt } from '$lib/services/test-service';
 	import { fetchPrompts } from '$lib/services/prompt-service';
@@ -100,9 +91,7 @@
 	}
 
 	async function handleDelete(character: Character) {
-		const confirmed = confirm(
-			`Are you sure you want to delete "${character.name}"? This action cannot be undone.`
-		);
+		const confirmed = confirm(`Are you sure you want to delete "${character.name}"? This action cannot be undone.`);
 		if (!confirmed) return;
 
 		try {
@@ -216,10 +205,8 @@
 	<!-- Header -->
 	<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 		<div>
-			<h1 class="h1 gradient-heading">Characters</h1>
-			<p class="opacity-75">
-				Manage your story characters with detailed descriptions, personalities, and backgrounds.
-			</p>
+			<h1 class="gradient-heading h1">Characters</h1>
+			<p class="opacity-75">Manage your story characters with detailed descriptions, personalities, and backgrounds.</p>
 		</div>
 
 		{#if !showForm}
@@ -235,9 +222,7 @@
 				<p>{error}</p>
 			</div>
 			<div class="alert-actions">
-				<Button size="sm" preset="ghost" color="error" onclick={() => (error = null)}>
-					Dismiss
-				</Button>
+				<Button size="sm" preset="ghost" color="error" onclick={() => (error = null)}>Dismiss</Button>
 			</div>
 		</aside>
 	{/if}
@@ -258,14 +243,7 @@
 
 	<!-- Character List -->
 	{#if !showForm}
-		<CharacterList
-			{characters}
-			onEdit={handleEdit}
-			onDelete={handleDelete}
-			onView={handleView}
-			onTest={handleTestCharacter}
-			{isLoading}
-		/>
+		<CharacterList {characters} onEdit={handleEdit} onDelete={handleDelete} onView={handleView} onTest={handleTestCharacter} {isLoading} />
 	{/if}
 
 	<!-- Refresh Button -->
@@ -298,44 +276,42 @@
 
 <!-- Test Result Modal -->
 <DetailModal isOpen={showTestResult} onClose={handleTestResultClose} title="Character Test Result">
-	{#snippet children()}
-		{#if testResult}
-			<div class="space-y-4">
-				<div>
-					<h4 class="h4 mb-2">Generated Text:</h4>
-					{#each testResult.text as textItem}
-						<p class="bg-surface-200-800 mb-2 rounded p-3 text-sm">{textItem}</p>
-					{/each}
-				</div>
-
-				{#if testResult.audio && testResult.audio.length > 0}
-					<div>
-						<h4 class="h4 mb-2">Generated Audio:</h4>
-						<div class="space-y-3">
-							{#each audioURLs as audioURL, index}
-								<div class="bg-surface-200-800 rounded p-3">
-									<p class="mb-2 text-sm opacity-75">Audio {index + 1}:</p>
-									<audio controls class="w-full">
-										<source src={audioURL} type="audio/mp3" />
-										Your browser does not support the audio element.
-									</audio>
-								</div>
-							{/each}
-						</div>
-					</div>
-				{/if}
-
-				{#if testResult.images && testResult.images.length > 0}
-					<div>
-						<h4 class="h4 mb-2">Image Files:</h4>
-						<ul class="list-inside list-disc text-sm">
-							{#each testResult.images as imageFile}
-								<li>{imageFile}</li>
-							{/each}
-						</ul>
-					</div>
-				{/if}
+	{#if testResult}
+		<div class="space-y-4">
+			<div>
+				<h4 class="mb-2 h4">Generated Text:</h4>
+				{#each testResult.text as textItem, index (index)}
+					<p class="mb-2 rounded bg-surface-200-800 p-3 text-sm">{textItem}</p>
+				{/each}
 			</div>
-		{/if}
-	{/snippet}
+
+			{#if testResult.audio && testResult.audio.length > 0}
+				<div>
+					<h4 class="mb-2 h4">Generated Audio:</h4>
+					<div class="space-y-3">
+						{#each audioURLs as audioURL, index (index)}
+							<div class="rounded bg-surface-200-800 p-3">
+								<p class="mb-2 text-sm opacity-75">Audio {index + 1}:</p>
+								<audio controls class="w-full">
+									<source src={audioURL} type="audio/mp3" />
+									Your browser does not support the audio element.
+								</audio>
+							</div>
+						{/each}
+					</div>
+				</div>
+			{/if}
+
+			{#if testResult.images && testResult.images.length > 0}
+				<div>
+					<h4 class="mb-2 h4">Image Files:</h4>
+					<ul class="list-inside list-disc text-sm">
+						{#each testResult.images as imageFile, index (index)}
+							<li>{imageFile}</li>
+						{/each}
+					</ul>
+				</div>
+			{/if}
+		</div>
+	{/if}
 </DetailModal>

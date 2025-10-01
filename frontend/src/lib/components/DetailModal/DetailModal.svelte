@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/Button/Button.svelte';
+	import type { Snippet } from 'svelte';
 
 	interface Props {
 		title: string;
@@ -11,21 +12,10 @@
 		editLabel?: string;
 		deleteLabel?: string;
 		testLabel?: string;
-		children: any;
+		children: Snippet;
 	}
 
-	let {
-		title,
-		isOpen,
-		onClose,
-		onEdit,
-		onDelete,
-		onTest,
-		editLabel = 'Edit',
-		deleteLabel = 'Delete',
-		testLabel = 'Test',
-		children
-	}: Props = $props();
+	let { title, isOpen, onClose, onEdit, onDelete, onTest, editLabel = 'Edit', deleteLabel = 'Delete', testLabel = 'Test', children }: Props = $props();
 
 	function handleKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
@@ -53,25 +43,15 @@
 	>
 		<!-- svelte-ignore a11y_click_events_have_key_events -->
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div
-			class="card preset-filled-surface-100-900 flex max-h-full w-full max-w-2xl flex-col shadow-2xl"
-			onclick={(e) => e.stopPropagation()}
-		>
+		<div class="flex max-h-full w-full max-w-2xl flex-col card preset-filled-surface-100-900 shadow-2xl" onclick={(e) => e.stopPropagation()}>
 			<!-- Header -->
-			<header
-				class="border-surface-500/20 flex flex-shrink-0 items-center justify-between border-b p-6"
-			>
+			<header class="flex flex-shrink-0 items-center justify-between border-b border-surface-500/20 p-6">
 				<h2 id="modal-title" class="h2">
 					{title}
 				</h2>
 				<Button onclick={onClose} preset="ghost-icon" size="sm" aria-label="Close modal">
 					<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M6 18L18 6M6 6l12 12"
-						></path>
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
 					</svg>
 				</Button>
 			</header>
@@ -82,7 +62,7 @@
 			</section>
 
 			<!-- Footer Actions -->
-			<footer class="border-surface-500/20 flex flex-shrink-0 items-center gap-3 border-t p-6">
+			<footer class="flex flex-shrink-0 items-center gap-3 border-t border-surface-500/20 p-6">
 				{#if onTest}
 					<Button onclick={onTest} preset="outlined" color="secondary">{testLabel}</Button>
 				{/if}

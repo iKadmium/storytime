@@ -42,7 +42,7 @@
 
 <div class="message">
 	<!-- Text content -->
-	{#each message.text as textLine}
+	{#each message.text as textLine, index (index)}
 		<div class="message-text">
 			{textLine}
 		</div>
@@ -51,7 +51,7 @@
 	<!-- Audio content -->
 	{#if audioUrls.length > 0}
 		<div class="message-audio">
-			{#each audioUrls as audioUrl, index}
+			{#each audioUrls as audioUrl, index (index)}
 				{@const isBase64Source = isBase64Audio(message.audio[index])}
 				<div class="audio-item">
 					{#if isBase64Source}
@@ -77,7 +77,7 @@
 	<!-- Image content -->
 	{#if message.images.length > 0}
 		<div class="message-images">
-			{#each message.images as imageFile}
+			{#each message.images as imageFile, index (index)}
 				<img src={imageFile} alt="Message attachment" />
 			{/each}
 		</div>

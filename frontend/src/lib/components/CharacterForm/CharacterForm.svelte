@@ -11,14 +11,7 @@
 		referenceVoiceFiles?: string[];
 	}
 
-	let {
-		character,
-		onSubmit,
-		onCancel,
-		isSubmitting = false,
-		submitLabel = 'Create Character',
-		referenceVoiceFiles = []
-	}: Props = $props();
+	let { character, onSubmit, onCancel, isSubmitting = false, submitLabel = 'Create Character', referenceVoiceFiles = [] }: Props = $props();
 
 	// Form fields
 	let name = $state(character?.name || '');
@@ -106,8 +99,8 @@
 	}
 </script>
 
-<div class="card preset-glass-surface p-6">
-	<h2 class="h2 mb-6">
+<div class="preset-glass-surface card p-6">
+	<h2 class="mb-6 h2">
 		{character ? 'Edit Character' : 'Create New Character'}
 	</h2>
 
@@ -115,13 +108,7 @@
 		<!-- Name Field -->
 		<label class="label">
 			<span>Name</span>
-			<input
-				type="text"
-				class="input"
-				bind:value={name}
-				disabled={isSubmitting || !!character}
-				placeholder="Enter character name"
-			/>
+			<input type="text" class="input" bind:value={name} disabled={isSubmitting || !!character} placeholder="Enter character name" />
 			{#if nameError}
 				<small class="text-error-500">{nameError}</small>
 			{/if}
@@ -130,12 +117,7 @@
 		<!-- Description Field -->
 		<label class="label">
 			<span>Description</span>
-			<textarea
-				class="textarea"
-				bind:value={description}
-				disabled={isSubmitting}
-				rows="3"
-				placeholder="Describe the character's appearance and basic traits"
+			<textarea class="textarea" bind:value={description} disabled={isSubmitting} rows="3" placeholder="Describe the character's appearance and basic traits"
 			></textarea>
 			{#if descriptionError}
 				<small class="text-error-500">{descriptionError}</small>
@@ -173,23 +155,20 @@
 		</label>
 
 		<!-- Voice Configuration (Optional) -->
-		<div class="card preset-glass-surface p-4">
-			<h3 class="h3 mb-4">Voice Configuration (Optional)</h3>
+		<div class="preset-glass-surface card p-4">
+			<h3 class="mb-4 h3">Voice Configuration (Optional)</h3>
 
 			<!-- Voice Name Field -->
 			<label class="label mb-4">
 				<span>Voice Name</span>
 				<select class="select" bind:value={voiceName} disabled={isSubmitting}>
 					<option value="">No voice selected</option>
-					{#each referenceVoiceFiles as voiceFile}
+					{#each referenceVoiceFiles as voiceFile, index (index)}
 						<option value={voiceFile}>{voiceFile}</option>
 					{/each}
 				</select>
 				{#if referenceVoiceFiles.length === 0}
-					<small class="text-warning-500"
-						>No reference voice files available. Upload some to the TTS server to enable voice
-						selection.</small
-					>
+					<small class="text-warning-500">No reference voice files available. Upload some to the TTS server to enable voice selection.</small>
 				{/if}
 			</label>
 
@@ -199,60 +178,28 @@
 					<!-- Temperature -->
 					<label class="label">
 						<span>Temperature: {temperature}</span>
-						<input
-							type="range"
-							min="0.1"
-							max="1.5"
-							step="0.1"
-							bind:value={temperature}
-							disabled={isSubmitting}
-							class="range"
-						/>
+						<input type="range" min="0.1" max="1.5" step="0.1" bind:value={temperature} disabled={isSubmitting} class="range" />
 						<small class="text-surface-500">Controls randomness and creativity in speech</small>
 					</label>
 
 					<!-- Exaggeration -->
 					<label class="label">
 						<span>Exaggeration: {exaggeration}</span>
-						<input
-							type="range"
-							min="0.0"
-							max="1.0"
-							step="0.1"
-							bind:value={exaggeration}
-							disabled={isSubmitting}
-							class="range"
-						/>
+						<input type="range" min="0.0" max="1.0" step="0.1" bind:value={exaggeration} disabled={isSubmitting} class="range" />
 						<small class="text-surface-500">Controls emotional emphasis in speech</small>
 					</label>
 
 					<!-- CFG Weight -->
 					<label class="label">
 						<span>CFG Weight: {cfgWeight}</span>
-						<input
-							type="range"
-							min="0.5"
-							max="2.0"
-							step="0.1"
-							bind:value={cfgWeight}
-							disabled={isSubmitting}
-							class="range"
-						/>
+						<input type="range" min="0.5" max="2.0" step="0.1" bind:value={cfgWeight} disabled={isSubmitting} class="range" />
 						<small class="text-surface-500">Controls adherence to voice characteristics</small>
 					</label>
 
 					<!-- Speed Factor -->
 					<label class="label">
 						<span>Speed Factor: {speedFactor}</span>
-						<input
-							type="range"
-							min="0.5"
-							max="2.0"
-							step="0.1"
-							bind:value={speedFactor}
-							disabled={isSubmitting}
-							class="range"
-						/>
+						<input type="range" min="0.5" max="2.0" step="0.1" bind:value={speedFactor} disabled={isSubmitting} class="range" />
 						<small class="text-surface-500">Controls speech speed</small>
 					</label>
 				</div>
@@ -268,9 +215,7 @@
 					{submitLabel}
 				{/if}
 			</Button>
-			<Button type="button" onclick={onCancel} disabled={isSubmitting} preset="outlined">
-				Cancel
-			</Button>
+			<Button type="button" onclick={onCancel} disabled={isSubmitting} preset="outlined">Cancel</Button>
 		</div>
 	</form>
 </div>

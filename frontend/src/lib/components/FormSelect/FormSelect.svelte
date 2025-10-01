@@ -15,16 +15,7 @@
 		error?: string;
 	}
 
-	let {
-		label,
-		value = $bindable(),
-		onChange,
-		options,
-		placeholder = '',
-		required = false,
-		disabled = false,
-		error = ''
-	}: Props = $props();
+	let { label, value = $bindable(), onChange, options, placeholder = '', required = false, disabled = false, error = '' }: Props = $props();
 
 	function handleChange(event: Event) {
 		const target = event.target as HTMLSelectElement;
@@ -41,7 +32,7 @@
 		{#if placeholder}
 			<option value="">{placeholder}</option>
 		{/if}
-		{#each options as option}
+		{#each options as option, index (index)}
 			<option value={option.value}>{option.label}</option>
 		{/each}
 	</select>

@@ -1,0 +1,20 @@
+{
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"eslint.lintTask.enable": true,
+	"eslint.probe": [
+		"astro",
+		"civet",
+		"javascript",
+		"javascriptreact",
+		"typescript",
+		"typescriptreact",
+		"html",
+		"mdx",
+		"vue",
+		"markdown",
+		"json",
+		"jsonc",
+		"svelte"
+	],
+	"eslint.validate": ["svelte"]
+}

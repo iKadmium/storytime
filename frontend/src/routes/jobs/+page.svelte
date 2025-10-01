@@ -8,13 +8,7 @@
 
 	import type { Job, CreateJobRequest, UpdateJobRequest } from '$lib/models/job';
 	import type { Message } from '$lib/models/chat';
-	import {
-		fetchJobs,
-		createJob,
-		updateJob,
-		deleteJob,
-		executeJob
-	} from '$lib/services/job-service';
+	import { fetchJobs, createJob, updateJob, deleteJob, executeJob } from '$lib/services/job-service';
 	import { jobSlug } from '$lib/utils/slug';
 	import { fetchCharacters } from '$lib/services/character-service';
 	import { fetchPrompts } from '$lib/services/prompt-service';
@@ -33,7 +27,7 @@
 	let editingJob = $state<Job | undefined>(undefined);
 	let viewingJob = $state<Job | undefined>(undefined);
 	let editingJobFilename = $state<string>('');
-	let executingJobId = $state<string | null>(null);
+	let _executingJobId = $state<string | null>(null);
 	let executionResult = $state<Message | null>(null);
 	let showExecutionResult = $state(false);
 
@@ -109,7 +103,7 @@
 	async function handleExecuteJob(job: Job) {
 		const jobId = `${job.character}-${job.prompt}`;
 		try {
-			executingJobId = jobId;
+			_executingJobId = jobId;
 			error = null;
 			const result = await executeJob(job, true); // Save to chat history for regular execution
 			executionResult = result;
@@ -118,14 +112,14 @@
 			error = err instanceof Error ? err.message : 'Failed to execute job';
 			console.error('Error executing job:', err);
 		} finally {
-			executingJobId = null;
+			_executingJobId = null;
 		}
 	}
 
 	async function handleTestJob2(job: Job) {
 		const jobId = `${job.character}-${job.prompt}`;
 		try {
-			executingJobId = jobId;
+			_executingJobId = jobId;
 			error = null;
 			const result = await executeJob(job, false); // Don't save to chat history for tests
 			executionResult = result;
@@ -134,7 +128,7 @@
 			error = err instanceof Error ? err.message : 'Failed to test job';
 			console.error('Error testing job:', err);
 		} finally {
-			executingJobId = null;
+			_executingJobId = null;
 		}
 	}
 
@@ -214,7 +208,7 @@
 	<!-- Header -->
 	<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 		<div>
-			<h1 class="h1 gradient-heading">Jobs</h1>
+			<h1 class="gradient-heading h1">Jobs</h1>
 			<p class="opacity-75">Manage automated interaction jobs that run on a schedule.</p>
 		</div>
 
@@ -231,9 +225,7 @@
 				<p>{error}</p>
 			</div>
 			<div class="alert-actions">
-				<Button size="sm" preset="ghost" color="error" onclick={() => (error = null)}>
-					Dismiss
-				</Button>
+				<Button size="sm" preset="ghost" color="error" onclick={() => (error = null)}>Dismiss</Button>
 			</div>
 		</aside>
 	{/if}
@@ -256,15 +248,7 @@
 
 	<!-- Job List -->
 	{#if !showForm}
-		<JobList
-			{jobs}
-			onEdit={handleEdit}
-			onDelete={handleDeleteJob}
-			onView={handleView}
-			onExecute={handleExecuteJob}
-			{isLoading}
-			generateFilename={jobSlug}
-		/>
+		<JobList {jobs} onEdit={handleEdit} onDelete={handleDeleteJob} onView={handleView} onExecute={handleExecuteJob} {isLoading} generateFilename={jobSlug} />
 	{/if}
 
 	<!-- Refresh Button -->
@@ -287,25 +271,21 @@
 />
 
 <!-- Job Execution Result Modal -->
-<DetailModal
-	isOpen={showExecutionResult}
-	onClose={() => (showExecutionResult = false)}
-	title="Job Execution Result"
->
+<DetailModal isOpen={showExecutionResult} onClose={() => (showExecutionResult = false)} title="Job Execution Result">
 	{#if executionResult}
 		<div class="space-y-4">
 			<div>
-				<h4 class="h4 mb-2">Generated Text:</h4>
-				{#each executionResult.text as textItem, index}
-					<p class="bg-surface-200-800 mb-2 rounded p-3 text-sm">{textItem}</p>
+				<h4 class="mb-2 h4">Generated Text:</h4>
+				{#each executionResult.text as textItem, index (index)}
+					<p class="mb-2 rounded bg-surface-200-800 p-3 text-sm">{textItem}</p>
 				{/each}
 			</div>
 
 			{#if executionResult.audio && executionResult.audio.length > 0}
 				<div>
-					<h4 class="h4 mb-2">Audio Files:</h4>
+					<h4 class="mb-2 h4">Audio Files:</h4>
 					<ul class="list-inside list-disc text-sm">
-						{#each executionResult.audio as audioFile}
+						{#each executionResult.audio as audioFile, index (index)}
 							<li>{audioFile}</li>
 						{/each}
 					</ul>
@@ -314,9 +294,9 @@
 
 			{#if executionResult.images && executionResult.images.length > 0}
 				<div>
-					<h4 class="h4 mb-2">Image Files:</h4>
+					<h4 class="mb-2 h4">Image Files:</h4>
 					<ul class="list-inside list-disc text-sm">
-						{#each executionResult.images as imageFile}
+						{#each executionResult.images as imageFile, index (index)}
 							<li>{imageFile}</li>
 						{/each}
 					</ul>

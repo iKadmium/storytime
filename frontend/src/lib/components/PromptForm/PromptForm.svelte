@@ -14,15 +14,7 @@
 		availableCharacters?: string[];
 	}
 
-	let {
-		prompt,
-		onSubmit,
-		onCancel,
-		onTest,
-		isSubmitting = false,
-		submitLabel = 'Create Prompt',
-		availableCharacters = []
-	}: Props = $props();
+	let { prompt, onSubmit, onCancel, onTest, isSubmitting = false, submitLabel = 'Create Prompt', availableCharacters = [] }: Props = $props();
 
 	// Form fields
 	let title = $state(prompt?.title || '');
@@ -114,8 +106,8 @@
 	}
 </script>
 
-<div class="card preset-glass-surface p-6">
-	<h2 class="h2 mb-6">
+<div class="preset-glass-surface card p-6">
+	<h2 class="mb-6 h2">
 		{prompt ? 'Edit Prompt' : 'Create New Prompt'}
 	</h2>
 
@@ -156,17 +148,9 @@
 		<div class="space-y-2">
 			<div class="flex items-center justify-between">
 				<span class="label font-medium">Setup Items</span>
-				<Button
-					type="button"
-					onclick={addSetupItem}
-					disabled={isSubmitting}
-					preset="outlined"
-					size="sm"
-				>
-					Add Item
-				</Button>
+				<Button type="button" onclick={addSetupItem} disabled={isSubmitting} preset="outlined" size="sm">Add Item</Button>
 			</div>
-			{#each setupItems as setupItem, index (index)}
+			{#each setupItems as _setupItem, index (index)}
 				<div class="flex items-start gap-2">
 					<div class="flex-1">
 						<FormTextarea
@@ -180,16 +164,7 @@
 						/>
 					</div>
 					{#if setupItems.length > 1}
-						<Button
-							type="button"
-							onclick={() => removeSetupItem(index)}
-							disabled={isSubmitting}
-							preset="outlined"
-							size="sm"
-							color="surface"
-						>
-							Remove
-						</Button>
+						<Button type="button" onclick={() => removeSetupItem(index)} disabled={isSubmitting} preset="outlined" size="sm" color="surface">Remove</Button>
 					{/if}
 				</div>
 			{/each}
@@ -200,21 +175,11 @@
 			<h3 class="h4">Output Options</h3>
 			<div class="flex flex-col gap-4">
 				<label class="flex items-center gap-2">
-					<input
-						type="checkbox"
-						bind:checked={createAudio}
-						disabled={isSubmitting}
-						class="checkbox"
-					/>
+					<input type="checkbox" bind:checked={createAudio} disabled={isSubmitting} class="checkbox" />
 					<span>Create Audio</span>
 				</label>
 				<label class="flex items-center gap-2">
-					<input
-						type="checkbox"
-						bind:checked={createImages}
-						disabled={isSubmitting}
-						class="checkbox"
-					/>
+					<input type="checkbox" bind:checked={createImages} disabled={isSubmitting} class="checkbox" />
 					<span>Create Images</span>
 				</label>
 			</div>
@@ -222,33 +187,20 @@
 
 		<!-- Test Section -->
 		{#if onTest && availableCharacters.length > 0}
-			<div class="border-surface-500/20 bg-surface-50/50 dark:bg-surface-900/50 rounded border p-4">
-				<h4 class="h4 mb-3">Test Prompt</h4>
+			<div class="rounded border border-surface-500/20 bg-surface-50/50 p-4 dark:bg-surface-900/50">
+				<h4 class="mb-3 h4">Test Prompt</h4>
 				<p class="mb-3 text-sm opacity-75">Test this prompt with a character before saving</p>
 				<div class="flex items-end gap-3">
 					<div class="flex-1">
-						<label for="character-select" class="mb-1 block text-sm font-medium">
-							Select Character
-						</label>
-						<select
-							id="character-select"
-							bind:value={selectedCharacter}
-							disabled={isSubmitting}
-							class="select w-full"
-						>
+						<label for="character-select" class="mb-1 block text-sm font-medium"> Select Character </label>
+						<select id="character-select" bind:value={selectedCharacter} disabled={isSubmitting} class="select w-full">
 							<option value="">-- Select Character --</option>
-							{#each availableCharacters as character}
+							{#each availableCharacters as character, index (index)}
 								<option value={character}>{character}</option>
 							{/each}
 						</select>
 					</div>
-					<Button
-						type="button"
-						preset="filled"
-						color="secondary"
-						onclick={handleTest}
-						disabled={isSubmitting || !selectedCharacter.trim() || !title.trim()}
-					>
+					<Button type="button" preset="filled" color="secondary" onclick={handleTest} disabled={isSubmitting || !selectedCharacter.trim() || !title.trim()}>
 						Test
 					</Button>
 				</div>
@@ -264,9 +216,7 @@
 					{submitLabel}
 				{/if}
 			</Button>
-			<Button type="button" onclick={onCancel} disabled={isSubmitting} preset="outlined">
-				Cancel
-			</Button>
+			<Button type="button" onclick={onCancel} disabled={isSubmitting} preset="outlined">Cancel</Button>
 		</div>
 	</form>
 </div>
