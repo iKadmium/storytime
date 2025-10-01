@@ -12,6 +12,18 @@ on:
         required: false
         type: string
         default: 'ghcr.io'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag for the Docker image'
+        required: true
+        type: string
+        default: 'manual'
+      registry:
+        description: 'Container registry'
+        required: false
+        type: string
+        default: 'ghcr.io'
 
 env:
   REGISTRY: ${{ inputs.registry }}
