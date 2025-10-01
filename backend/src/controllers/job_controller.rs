@@ -483,9 +483,12 @@ async fn execute_ai_workflow(
             if let Some(assistant_response) = response_prompt.last_assistant_message() {
                 assistant_response
                     .to_string()
-                    .split_terminator("<br>")
+                    .replace("<br>", "\n")
+                    .split_terminator(['\n', '\r'])
                     .for_each(|line| {
-                        final_responses.push(line.trim().to_string());
+                        if !line.trim().is_empty() {
+                            final_responses.push(line.trim().to_string());
+                        }
                     });
             }
 
