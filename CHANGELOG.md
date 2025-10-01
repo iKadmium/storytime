@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/iKadmium/storytime/compare/v1.3.0...v1.3.1) (2025-10-01)
+
+
+### Bug Fixes
+
+* Fix similar jobs ([963475e](https://github.com/iKadmium/storytime/commit/963475e6735a419c55a4169335cd6cec7b4f17de))
+
 ## [1.3.0](https://github.com/iKadmium/storytime/compare/v1.2.0...v1.3.0) (2025-10-01)
 
 
