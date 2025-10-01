@@ -6,6 +6,7 @@
 
 import type { Chat, CreateChatRequest, UpdateChatRequest, AddMessageRequest, ChatListItem } from '$lib/models/chat';
 import { base64ToAudioURL } from '$lib/utils/audio-utils';
+import { toSlug } from '$lib/utils/slug';
 
 const API_BASE_URL = '/api';
 
@@ -35,7 +36,7 @@ export async function getAllChats(): Promise<string[]> {
 /**
  * Get a specific chat by character name
  */
-export async function getChat(character: string): Promise<Chat> {
+export async function getChat(character: string, fetch: typeof window.fetch): Promise<Chat> {
 	const response = await fetch(`${API_BASE_URL}/chats/${encodeURIComponent(character)}`);
 	if (!response.ok) {
 		throw new Error(`Failed to fetch chat for ${character}: ${response.statusText}`);
@@ -149,13 +150,15 @@ export async function getChatListItems(): Promise<ChatListItem[]> {
 	// Fetch each chat to get last message info
 	for (const name of chatNames) {
 		try {
-			const chat = await getChat(name);
+			const chat = await getChat(name, window.fetch);
 			const lastMessage = chat.messages.length > 0 ? chat.messages[chat.messages.length - 1].text.join(' ') : '';
+			const unreadCount = chat.messages.filter((message) => !message.read).length;
 
 			chatListItems.push({
 				character: chat.character,
 				lastMessage: lastMessage || 'No messages yet',
-				messageCount: chat.messages.length
+				messageCount: chat.messages.length,
+				unreadCount: unreadCount
 				// Note: We don't have timestamp data from backend, so we skip lastActivity for now
 			});
 		} catch (error) {
@@ -164,7 +167,8 @@ export async function getChatListItems(): Promise<ChatListItem[]> {
 			chatListItems.push({
 				character: name,
 				lastMessage: 'Error loading messages',
-				messageCount: 0
+				messageCount: 0,
+				unreadCount: 0
 			});
 		}
 	}
@@ -200,4 +204,52 @@ export function isBase64Audio(audioData: string): boolean {
  */
 export function convertTestAudioToUrl(base64Audio: string): string {
 	return base64ToAudioURL(base64Audio);
+}
+
+/**
+ * Mark a specific message as read
+ */
+export async function markMessageAsRead(character: string, messageIndex: number): Promise<Chat> {
+	const slug = toSlug(character);
+	const response = await fetch(`${API_BASE_URL}/chats/${encodeURIComponent(slug)}/messages/${messageIndex}/read`, {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+
+	if (!response.ok) {
+		throw new Error(`Failed to mark message as read: ${response.statusText}`);
+	}
+
+	const result: ApiResponse<Chat> = await response.json();
+	if (!result.success || !result.data) {
+		throw new Error(result.message || 'Failed to mark message as read');
+	}
+
+	return result.data;
+}
+
+/**
+ * Mark all messages in a chat as read
+ */
+export async function markAllMessagesAsRead(character: string): Promise<Chat> {
+	const slug = toSlug(character);
+	const response = await fetch(`${API_BASE_URL}/chats/${encodeURIComponent(slug)}/read-all`, {
+		method: 'PUT',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+
+	if (!response.ok) {
+		throw new Error(`Failed to mark all messages as read: ${response.statusText}`);
+	}
+
+	const result: ApiResponse<Chat> = await response.json();
+	if (!result.success || !result.data) {
+		throw new Error(result.message || 'Failed to mark all messages as read');
+	}
+
+	return result.data;
 }

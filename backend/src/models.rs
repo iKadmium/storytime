@@ -192,6 +192,8 @@ pub struct Message {
     pub audio: Vec<String>,
     #[serde(default)]
     pub images: Vec<String>,
+    #[serde(default)]
+    pub read: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -218,6 +220,8 @@ pub struct AddMessageRequest {
     pub audio: Vec<String>,
     #[serde(default)]
     pub images: Vec<String>,
+    #[serde(default)]
+    pub read: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -225,6 +229,7 @@ pub struct UpdateMessageRequest {
     pub text: Option<Vec<String>>,
     pub audio: Option<Vec<String>>,
     pub images: Option<Vec<String>>,
+    pub read: Option<bool>,
 }
 
 // Job models

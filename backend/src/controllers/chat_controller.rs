@@ -279,6 +279,7 @@ pub async fn add_message(
         text: payload.text,
         audio: payload.audio,
         images: payload.images,
+        read: payload.read,
     };
 
     chat.messages.push(message);
@@ -356,6 +357,9 @@ pub async fn update_message(
     }
     if let Some(images) = payload.images {
         message.images = images;
+    }
+    if let Some(read) = payload.read {
+        message.read = read;
     }
 
     match save_chat(&character, &chat).await {
@@ -435,6 +439,128 @@ pub async fn delete_message(
                     success: false,
                     data: None,
                     message: format!("Failed to delete message: {e}"),
+                }),
+            ))
+        }
+    }
+}
+
+/// Mark a specific message as read
+pub async fn mark_message_as_read(
+    Path((character, message_index)): Path<(String, usize)>,
+) -> Result<Json<ApiResponse<Chat>>, (StatusCode, Json<ApiResponse<()>>)> {
+    let mut chat = match load_chat(&character).await {
+        Ok(chat) => chat,
+        Err(e) => {
+            if e.to_string().contains("No such file or directory") {
+                return Err((
+                    StatusCode::NOT_FOUND,
+                    Json(ApiResponse {
+                        success: false,
+                        data: None,
+                        message: format!("Chat for character '{character}' not found"),
+                    }),
+                ));
+            } else {
+                tracing::error!("Failed to load chat for character '{character}': {e}");
+                return Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(ApiResponse {
+                        success: false,
+                        data: None,
+                        message: format!("Failed to load chat: {e}"),
+                    }),
+                ));
+            }
+        }
+    };
+
+    if message_index >= chat.messages.len() {
+        return Err((
+            StatusCode::NOT_FOUND,
+            Json(ApiResponse {
+                success: false,
+                data: None,
+                message: format!("Message at index {message_index} not found"),
+            }),
+        ));
+    }
+
+    // Mark the message as read
+    chat.messages[message_index].read = true;
+
+    match save_chat(&character, &chat).await {
+        Ok(_) => Ok(Json(ApiResponse {
+            success: true,
+            data: Some(chat),
+            message: "Message marked as read successfully".to_string(),
+        })),
+        Err(e) => {
+            tracing::error!("Failed to save chat after marking message as read: {}", e);
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiResponse {
+                    success: false,
+                    data: None,
+                    message: format!("Failed to mark message as read: {e}"),
+                }),
+            ))
+        }
+    }
+}
+
+/// Mark all messages in a chat as read
+pub async fn mark_all_messages_as_read(
+    Path(character): Path<String>,
+) -> Result<Json<ApiResponse<Chat>>, (StatusCode, Json<ApiResponse<()>>)> {
+    let mut chat = match load_chat(&character).await {
+        Ok(chat) => chat,
+        Err(e) => {
+            if e.to_string().contains("No such file or directory") {
+                return Err((
+                    StatusCode::NOT_FOUND,
+                    Json(ApiResponse {
+                        success: false,
+                        data: None,
+                        message: format!("Chat for character '{character}' not found"),
+                    }),
+                ));
+            } else {
+                tracing::error!("Failed to load chat for character '{character}': {e}");
+                return Err((
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(ApiResponse {
+                        success: false,
+                        data: None,
+                        message: format!("Failed to load chat: {e}"),
+                    }),
+                ));
+            }
+        }
+    };
+
+    // Mark all messages as read
+    for message in &mut chat.messages {
+        message.read = true;
+    }
+
+    match save_chat(&character, &chat).await {
+        Ok(_) => Ok(Json(ApiResponse {
+            success: true,
+            data: Some(chat),
+            message: "All messages marked as read successfully".to_string(),
+        })),
+        Err(e) => {
+            tracing::error!(
+                "Failed to save chat after marking all messages as read: {}",
+                e
+            );
+            Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(ApiResponse {
+                    success: false,
+                    data: None,
+                    message: format!("Failed to mark all messages as read: {e}"),
                 }),
             ))
         }

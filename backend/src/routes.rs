@@ -17,7 +17,7 @@ use crate::controllers::{
     },
     chat_controller::{
         add_message, create_chat, delete_chat_endpoint, delete_message, get_chat, get_chats,
-        update_chat, update_message,
+        mark_all_messages_as_read, mark_message_as_read, update_chat, update_message,
     },
     health_controller::{health_check, hello, hello_name},
     job_controller::{
@@ -63,6 +63,15 @@ pub fn create_app(settings: Arc<Settings>) -> Router {
         .route(
             "/api/chats/{character}/messages/{message_index}",
             put(update_message).delete(delete_message),
+        )
+        // Mark messages as read routes
+        .route(
+            "/api/chats/{character}/read-all",
+            put(mark_all_messages_as_read),
+        )
+        .route(
+            "/api/chats/{character}/messages/{message_index}/read",
+            put(mark_message_as_read),
         )
         // Job CRUD routes
         .route("/api/jobs", get(get_jobs).post(create_job))

@@ -1,18 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { PageData } from './$types';
+	import type { PageProps } from './$types';
 	import type { ChatListItem as ChatListItemType } from '$lib/models/chat';
 	import ChatListItem from '$lib/components/ChatListItem/ChatListItem.svelte';
-	import { getChatListItems } from '$lib/services/chat-service';
+	import { getChatListItems, markMessageAsRead, markAllMessagesAsRead } from '$lib/services/chat-service';
 	import { toSlug } from '$lib/utils/slug';
 
-	interface Props {
-		data: PageData;
-	}
-
-	let { data }: Props = $props();
-	let chat = $derived(data.chat);
-	let chats: ChatListItemType[] = $state([]);
+	let props: PageProps = $props();
+	let chat = $derived(props.data.chat);
+	let chats = $state<ChatListItemType[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 
@@ -30,6 +26,48 @@
 		}
 	});
 
+	// Effect to scroll to first unread when loading is complete and chat has messages
+	$effect(() => {
+		if (!loading && chat.messages.length > 0) {
+			// Use a timeout to ensure DOM is fully rendered
+			setTimeout(() => {
+				scrollToFirstUnread();
+			}, 250);
+		}
+	});
+
+	function scrollToFirstUnread() {
+		// Find the first unread message
+		const firstUnreadMessage = document.querySelector('.message.unread');
+		if (firstUnreadMessage) {
+			// Get the chat messages container
+			const messagesContainer = document.querySelector('.chat-messages');
+			if (messagesContainer) {
+				// Get the position of the first unread message relative to the container
+				const messageRect = firstUnreadMessage.getBoundingClientRect();
+				const containerRect = messagesContainer.getBoundingClientRect();
+				const scrollOffset = messageRect.top - containerRect.top + messagesContainer.scrollTop - 80; // 80px padding from top
+
+				messagesContainer.scrollTo({
+					top: Math.max(0, scrollOffset), // Ensure we don't scroll to negative values
+					behavior: 'smooth'
+				});
+			} else {
+				// Fallback to scrollIntoView if container not found
+				firstUnreadMessage.scrollIntoView({
+					behavior: 'smooth',
+					block: 'start'
+				});
+			}
+		} else {
+			// If no unread messages, scroll to the bottom to show latest messages
+			const messagesContainer = document.querySelector('.chat-messages');
+			if (messagesContainer) {
+				messagesContainer.scrollTop = messagesContainer.scrollHeight;
+			}
+		}
+	}
+
 	function getInitials(name: string): string {
 		return name
 			.split(' ')
@@ -40,6 +78,27 @@
 
 	function getAudioUrl(character: string, audioId: string): string {
 		return `/audio/${encodeURIComponent(toSlug(character))}/${audioId}.mp3`;
+	}
+
+	async function handleMarkMessageAsRead(messageIndex: number) {
+		try {
+			chat.messages[messageIndex].read = true;
+			chat = await markMessageAsRead(chat.character, messageIndex);
+			// Re-fetch chats to update the unread count
+			chats = await getChatListItems();
+		} catch (e) {
+			console.error('Error marking message as read:', e);
+		}
+	}
+
+	async function handleMarkAllAsRead() {
+		try {
+			chat = await markAllMessagesAsRead(chat.character);
+			// Re-fetch chats to update the unread count
+			chats = await getChatListItems();
+		} catch (e) {
+			console.error('Error marking all messages as read:', e);
+		}
 	}
 </script>
 
@@ -85,7 +144,9 @@
 			</div>
 
 			<div class="chat-actions">
-				<!-- Placeholder for future actions like settings, etc. -->
+				{#if chat.messages.length > 0}
+					<button class="mark-all-read-btn" onclick={handleMarkAllAsRead} title="Mark all messages as read"> Mark All as Read </button>
+				{/if}
 			</div>
 		</header>
 
@@ -98,12 +159,12 @@
 			{:else}
 				<div class="messages-container">
 					{#each chat.messages as message, index (index)}
-						<div class="message character">
+						<div class="message character" class:unread={!message.read} data-message-index={index} id="message-{index}">
 							<div class="message-avatar">
 								<span class="avatar-text">{getInitials(chat.character)}</span>
 							</div>
 							<div class="message-content">
-								{#each message.text as messageLine, index (index)}
+								{#each message.text as messageLine, messageLineIndex (messageLineIndex)}
 									<div class="message-text">
 										{messageLine}
 									</div>
@@ -111,7 +172,7 @@
 
 								{#if message.audio.length > 0}
 									<div class="message-audio">
-										{#each message.audio as audioId, index (index)}
+										{#each message.audio as audioId, audioIndex (audioIndex)}
 											<audio controls>
 												<source src={getAudioUrl(chat.character, audioId)} type="audio/mpeg" />
 												Audio not supported
@@ -122,10 +183,18 @@
 
 								{#if message.images.length > 0}
 									<div class="message-images">
-										{#each message.images as imageFile, index (index)}
+										{#each message.images as imageFile, imageIndex (imageIndex)}
 											<img src={imageFile} alt="Message attachment" />
 										{/each}
 									</div>
+								{/if}
+							</div>
+							<div class="message-actions">
+								{#if !message.read}
+									<span class="unread-indicator">New</span>
+									<button class="mark-read-btn" onclick={() => handleMarkMessageAsRead(index)} title="Mark as read"> ✓ </button>
+								{:else}
+									<span class="read-indicator">Read</span>
 								{/if}
 							</div>
 
@@ -236,6 +305,29 @@
 		color: var(--color-surface-600);
 	}
 
+	.chat-actions {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+
+	.mark-all-read-btn {
+		padding: 8px 16px;
+		background-color: var(--color-primary-600);
+		color: white;
+		border: none;
+		border-radius: 6px;
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+		white-space: nowrap;
+	}
+
+	.mark-all-read-btn:hover {
+		background-color: var(--color-primary-700);
+	}
+
 	.chat-messages {
 		flex: 1;
 		overflow-y: auto;
@@ -342,6 +434,73 @@
 		object-fit: cover;
 	}
 
+	.chat-actions {
+		display: flex;
+		justify-content: flex-end;
+		margin-bottom: 16px;
+		gap: 12px;
+	}
+
+	.mark-all-read-btn {
+		padding: 8px 16px;
+		background-color: var(--color-primary-600);
+		color: white;
+		border: none;
+		border-radius: 6px;
+		font-size: 14px;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+	}
+
+	.mark-all-read-btn:hover {
+		background-color: var(--color-primary-700);
+	}
+
+	.message.unread {
+		border-left: 4px solid var(--color-primary-500);
+		padding-left: 12px;
+		background-color: var(--color-primary-50);
+		border-radius: 4px;
+	}
+
+	.message-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-left: 8px;
+		flex-shrink: 0;
+	}
+
+	.unread-indicator {
+		font-size: 12px;
+		color: var(--color-primary-600);
+		font-weight: 600;
+		background-color: var(--color-primary-100);
+		padding: 2px 8px;
+		border-radius: 12px;
+	}
+
+	.read-indicator {
+		font-size: 12px;
+		color: var(--color-surface-500);
+		font-weight: 500;
+	}
+
+	.mark-read-btn {
+		padding: 4px 8px;
+		background-color: var(--color-primary-600);
+		color: white;
+		border: none;
+		border-radius: 4px;
+		font-size: 12px;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+	}
+
+	.mark-read-btn:hover {
+		background-color: var(--color-primary-700);
+	}
+
 	@media (max-width: 768px) {
 		.chat-app {
 			flex-direction: column;
@@ -443,6 +602,30 @@
 
 		.message-avatar .avatar-text {
 			color: var(--color-primary-300);
+		}
+
+		.message.unread {
+			background-color: var(--color-primary-900);
+			border-left-color: var(--color-primary-400);
+		}
+
+		.unread-indicator {
+			background-color: var(--color-primary-800);
+			color: var(--color-primary-200);
+		}
+
+		.read-indicator {
+			color: var(--color-surface-400);
+		}
+
+		.mark-all-read-btn,
+		.mark-read-btn {
+			background-color: var(--color-primary-700);
+		}
+
+		.mark-all-read-btn:hover,
+		.mark-read-btn:hover {
+			background-color: var(--color-primary-600);
 		}
 	}
 </style>

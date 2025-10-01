@@ -648,6 +648,7 @@ async fn execute_ai_services(
         text: llm_responses,
         audio,
         images: vec![], // TODO: Add image generation support if needed
+        read: false,    // New messages are unread by default
     })
 }
 

@@ -31,9 +31,11 @@
 	<div class="chat-content">
 		<div class="chat-header">
 			<h3 class="character-name">{chat.character}</h3>
-			{#if chat.messageCount > 0}
-				<span class="message-count">{chat.messageCount}</span>
-			{/if}
+			<div class="chat-counts">
+				{#if chat.unreadCount && chat.unreadCount > 0}
+					<span class="unread-count">{chat.unreadCount}</span>
+				{/if}
+			</div>
 		</div>
 
 		<div class="last-message">
@@ -110,15 +112,34 @@
 		text-overflow: ellipsis;
 	}
 
-	.message-count {
-		background-color: var(--color-primary-500);
+	.chat-counts {
+		display: flex;
+		gap: 6px;
+		align-items: center;
+	}
+
+	.unread-count {
+		background-color: var(--color-red-500);
 		color: white;
 		border-radius: 12px;
 		padding: 2px 8px;
 		font-size: 12px;
-		font-weight: 500;
+		font-weight: 600;
 		min-width: 20px;
 		text-align: center;
+		animation: pulse 2s infinite;
+	}
+
+	@keyframes pulse {
+		0% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.7;
+		}
+		100% {
+			opacity: 1;
+		}
 	}
 
 	.last-message {
