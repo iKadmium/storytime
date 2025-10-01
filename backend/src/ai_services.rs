@@ -10,7 +10,7 @@ pub(crate) async fn call_llm_chatml(
 
     let kobold_request = KoboldCppGenerate {
         max_context_length: 8192,
-        max_length: 200,
+        max_length: 1000,
         prompt: prompt_string.clone(),
         quiet: false,
         rep_pen: 1.0,
