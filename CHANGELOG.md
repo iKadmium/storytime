@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/iKadmium/storytime/compare/v1.0.0...v1.1.0) (2025-10-01)
+
+
+### Features
+
+* add release please config ([718f2b0](https://github.com/iKadmium/storytime/commit/718f2b05ffea93c1028fe15660496d461b5feee8))
+
+
+### Miscellaneous
+
+* add manifest ([01169ed](https://github.com/iKadmium/storytime/commit/01169ed97a6946a615493e7355811b0a7042e308))
+
 ## 1.0.0 (2025-10-01)
 
 
