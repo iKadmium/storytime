@@ -1,4 +1,4 @@
-import cronstrue from "cronstrue";
+import cronstrue from 'cronstrue';
 
 export function formatCadence(cadence: string): string {
 	try {

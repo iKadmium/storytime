@@ -128,7 +128,7 @@
 			/>
 		{/if}
 		{#if characterError}
-			<div class="text-error-500 mt-1 text-sm">{characterError}</div>
+			<div class="mt-1 text-sm text-error-500">{characterError}</div>
 		{/if}
 	</div>
 
@@ -156,7 +156,7 @@
 			/>
 		{/if}
 		{#if promptError}
-			<div class="text-error-500 mt-1 text-sm">{promptError}</div>
+			<div class="mt-1 text-sm text-error-500">{promptError}</div>
 		{/if}
 	</div>
 
@@ -175,12 +175,12 @@
 			disabled={isSubmitting}
 		/>
 		{#if cadenceError}
-			<div class="text-error-500 mt-1 text-sm">{cadenceError}</div>
+			<div class="mt-1 text-sm text-error-500">{cadenceError}</div>
 		{:else}
-			<div class="text-surface-500 mt-1 text-sm">
+			<div class="mt-1 text-sm text-surface-500">
 				Format: minute hour day month day-of-week (e.g., "30 9,10,11 * * 1-5" = 9:30, 10:30, 11:30 AM on weekdays)
 			</div>
-			<div class="text-surface-500 mt-1 text-sm">Current parsed value: "{cadencePlain || 'N/A'}"</div>
+			<div class="mt-1 text-sm text-surface-500">Current parsed value: "{cadencePlain || 'N/A'}"</div>
 		{/if}
 	</div>
 
@@ -190,7 +190,7 @@
 			<input type="checkbox" class="checkbox" bind:checked={usePromptOverride} disabled={isSubmitting} />
 			<span>Use custom prompt override</span>
 		</label>
-		<div class="text-surface-500 mt-1 text-sm">Enable this to override the default prompt template for this specific job</div>
+		<div class="mt-1 text-sm text-surface-500">Enable this to override the default prompt template for this specific job</div>
 	</div>
 
 	<!-- Prompt Override Field (only shown when checkbox is checked) -->
@@ -209,9 +209,9 @@
 				disabled={isSubmitting}
 			></textarea>
 			{#if promptOverrideError}
-				<div class="text-error-500 mt-1 text-sm">{promptOverrideError}</div>
+				<div class="mt-1 text-sm text-error-500">{promptOverrideError}</div>
 			{:else}
-				<div class="text-surface-500 mt-1 text-sm">This text will override the default prompt template for this specific job</div>
+				<div class="mt-1 text-sm text-surface-500">This text will override the default prompt template for this specific job</div>
 			{/if}
 		</div>
 	{/if}
