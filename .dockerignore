@@ -13,7 +13,6 @@ frontend/.svelte-kit
 
 # Rust build artifacts
 backend/target
-backend/Cargo.lock
 
 # IDE files
 .vscode
