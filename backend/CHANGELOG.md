@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/iKadmium/storytime/compare/backend-v0.4.0...backend-v0.4.1) (2025-10-01)
+
+
+### Bug Fixes
+
+* Fix similar jobs ([963475e](https://github.com/iKadmium/storytime/commit/963475e6735a419c55a4169335cd6cec7b4f17de))
+
 ## [0.4.0](https://github.com/iKadmium/storytime/compare/backend-v0.3.0...backend-v0.4.0) (2025-10-01)
 
 
