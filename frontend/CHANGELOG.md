@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/iKadmium/storytime/compare/frontend-v0.2.0...frontend-v0.3.0) (2025-10-01)
+
+
+### Features
+
+* unread display and scroll to latest unread ([bacc4be](https://github.com/iKadmium/storytime/commit/bacc4be552995aaf987c39206ccacb3b5db59531))
+
 ## [0.2.0](https://github.com/iKadmium/storytime/compare/frontend-v0.1.1...frontend-v0.2.0) (2025-10-01)
 
 
