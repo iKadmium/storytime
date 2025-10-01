@@ -34,6 +34,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Download frontend build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: ./artifacts/frontend/
+
+      - name: Download backend artifacts (amd64)
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-amd64
+          path: ./artifacts/backend-amd64/
+
+      - name: Download backend artifacts (arm64)  
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-arm64
+          path: ./artifacts/backend-arm64/
+
+      - name: Make backend binaries executable
+        run: |
+          chmod +x ./artifacts/backend-amd64/backend
+          chmod +x ./artifacts/backend-arm64/backend
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -59,6 +82,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          file: ./Dockerfile.gha
           platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

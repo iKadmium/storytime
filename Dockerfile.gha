@@ -1,0 +1,27 @@
+# Production Runtime - expects pre-built artifacts
+FROM debian:bookworm-slim AS runtime
+
+# Install runtime dependencies (no OpenSSL needed with rustls)
+RUN apt-get update && \
+    apt-get install -y \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /app
+
+# Copy the pre-built backend binary (architecture will be determined by build context)
+ARG TARGETARCH
+COPY artifacts/backend-${TARGETARCH}/backend /app/backend
+
+# Copy the pre-built frontend assets
+COPY artifacts/frontend/ /app/assets
+
+# Make the binary executable
+RUN chmod +x /app/backend
+
+# Expose port (assuming the Rust app runs on port 3000, adjust if needed)
+EXPOSE 3000
+
+# Run the backend application
+CMD ["/app/backend"]
