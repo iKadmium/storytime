@@ -1,0 +1,32 @@
+{
+    "packages": {
+        ".": {
+            "release-type": "simple",
+            "include-component-in-tag": false,
+            "changelog-sections": [
+                {
+                    "type": "feat",
+                    "section": "Features"
+                },
+                {
+                    "type": "fix",
+                    "section": "Bug Fixes"
+                },
+                {
+                    "type": "chore",
+                    "section": "Miscellaneous",
+                    "hidden": false
+                }
+            ]
+        },
+        "backend": {
+            "release-type": "rust",
+            "package-name": "backend"
+        },
+        "frontend": {
+            "release-type": "node",
+            "package-name": "frontend"
+        }
+    },
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}
