@@ -130,5 +130,3 @@ jobs:
       version: ${{ needs.release.outputs.version }}
       registry: ghcr.io
       image-name: ${{ github.repository }}
-    secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
