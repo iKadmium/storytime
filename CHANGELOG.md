@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.4.0](https://github.com/iKadmium/storytime/compare/v1.3.1...v1.4.0) (2025-10-02)
+
+
+### Features
+
+* Message deletion ([afebc73](https://github.com/iKadmium/storytime/commit/afebc73926341f3ba01ab4655b588272c867926f))
+* Message timestamps ([afebc73](https://github.com/iKadmium/storytime/commit/afebc73926341f3ba01ab4655b588272c867926f))
+
+
+### Bug Fixes
+
+* Fix scheduling of new/updated jobs ([afebc73](https://github.com/iKadmium/storytime/commit/afebc73926341f3ba01ab4655b588272c867926f))
+* Mobile frontend fixes ([afebc73](https://github.com/iKadmium/storytime/commit/afebc73926341f3ba01ab4655b588272c867926f))
+
 ## [1.3.1](https://github.com/iKadmium/storytime/compare/v1.3.0...v1.3.1) (2025-10-01)
 
 

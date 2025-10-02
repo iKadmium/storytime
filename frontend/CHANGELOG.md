@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0](https://github.com/iKadmium/storytime/compare/frontend-v0.3.1...frontend-v0.4.0) (2025-10-02)
+
+
+### Features
+
+* Message deletion ([afebc73](https://github.com/iKadmium/storytime/commit/afebc73926341f3ba01ab4655b588272c867926f))
+* Message timestamps ([afebc73](https://github.com/iKadmium/storytime/commit/afebc73926341f3ba01ab4655b588272c867926f))
+
+
+### Bug Fixes
+
+* Fix scheduling of new/updated jobs ([afebc73](https://github.com/iKadmium/storytime/commit/afebc73926341f3ba01ab4655b588272c867926f))
+* Mobile frontend fixes ([afebc73](https://github.com/iKadmium/storytime/commit/afebc73926341f3ba01ab4655b588272c867926f))
+
 ## [0.3.1](https://github.com/iKadmium/storytime/compare/frontend-v0.3.0...frontend-v0.3.1) (2025-10-01)
 
 
