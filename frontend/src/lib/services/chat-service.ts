@@ -253,3 +253,27 @@ export async function markAllMessagesAsRead(character: string): Promise<Chat> {
 
 	return result.data;
 }
+
+/**
+ * Delete a specific message from a chat
+ */
+export async function deleteMessage(character: string, messageIndex: number): Promise<Chat> {
+	const slug = toSlug(character);
+	const response = await fetch(`${API_BASE_URL}/chats/${encodeURIComponent(slug)}/messages/${messageIndex}`, {
+		method: 'DELETE',
+		headers: {
+			'Content-Type': 'application/json'
+		}
+	});
+
+	if (!response.ok) {
+		throw new Error(`Failed to delete message: ${response.statusText}`);
+	}
+
+	const result: ApiResponse<Chat> = await response.json();
+	if (!result.success || !result.data) {
+		throw new Error(result.message || 'Failed to delete message');
+	}
+
+	return result.data;
+}

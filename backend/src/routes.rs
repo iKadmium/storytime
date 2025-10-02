@@ -7,8 +7,9 @@ use tower::ServiceBuilder;
 use tower_http::{
     cors::CorsLayer,
     services::{ServeDir, ServeFile},
-    trace::TraceLayer,
+    trace::{self, TraceLayer},
 };
+use tracing::Level;
 
 use crate::controllers::{
     audio_controller::serve_audio,
@@ -98,7 +99,12 @@ pub fn create_app(settings: Arc<Settings>) -> Router {
         .with_state(settings)
         .layer(
             ServiceBuilder::new()
-                .layer(TraceLayer::new_for_http())
+                .layer(
+                    TraceLayer::new_for_http()
+                        .make_span_with(trace::DefaultMakeSpan::new().level(Level::INFO))
+                        .on_request(trace::DefaultOnRequest::new().level(Level::INFO))
+                        .on_response(trace::DefaultOnResponse::new().level(Level::INFO)),
+                )
                 .layer(CorsLayer::permissive()),
         )
 }

@@ -1,4 +1,5 @@
 use axum::{Json as JsonExtract, extract::Path, http::StatusCode, response::Json};
+use chrono::Utc;
 use std::path::PathBuf;
 use tokio::fs;
 
@@ -6,6 +7,7 @@ use crate::models::{
     AddMessageRequest, ApiResponse, Chat, CreateChatRequest, Message, UpdateChatRequest,
     UpdateMessageRequest,
 };
+use crate::utils::{audio_file_path, image_file_path};
 
 /// Get all chats
 pub async fn get_chats()
@@ -280,6 +282,7 @@ pub async fn add_message(
         audio: payload.audio,
         images: payload.images,
         read: payload.read,
+        timestamp: payload.timestamp.unwrap_or_else(Utc::now),
     };
 
     chat.messages.push(message);
@@ -361,6 +364,9 @@ pub async fn update_message(
     if let Some(read) = payload.read {
         message.read = read;
     }
+    if let Some(timestamp) = payload.timestamp {
+        message.timestamp = timestamp;
+    }
 
     match save_chat(&character, &chat).await {
         Ok(_) => Ok(Json(ApiResponse {
@@ -421,6 +427,19 @@ pub async fn delete_message(
                 message: format!("Message at index {message_index} not found"),
             }),
         ));
+    }
+
+    // Get the message before deletion to clean up associated files
+    let message_to_delete = &chat.messages[message_index];
+
+    // Clean up associated audio files
+    if let Err(e) = delete_message_files(&character, message_to_delete).await {
+        tracing::warn!(
+            "Failed to delete some associated files for message {}: {}",
+            message_index,
+            e
+        );
+        // Don't fail the entire operation if file cleanup fails
     }
 
     chat.messages.remove(message_index);
@@ -619,5 +638,31 @@ async fn save_chat(
 async fn delete_chat(character: &str) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let file_path = PathBuf::from("data/chats").join(format!("{character}.json"));
     fs::remove_file(file_path).await?;
+    Ok(())
+}
+
+/// Delete associated files (audio and images) for a message
+async fn delete_message_files(
+    character: &str,
+    message: &Message,
+) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
+    // Delete audio files
+    for audio_file in &message.audio {
+        let file_path = audio_file_path(character, audio_file);
+        if let Err(e) = fs::remove_file(&file_path).await {
+            tracing::warn!("Failed to delete audio file '{}': {}", file_path, e);
+            // Continue with other files instead of failing entirely
+        }
+    }
+
+    // Delete image files
+    for image_file in &message.images {
+        let file_path = image_file_path(character, image_file);
+        if let Err(e) = fs::remove_file(&file_path).await {
+            tracing::warn!("Failed to delete image file '{}': {}", file_path, e);
+            // Continue with other files instead of failing entirely
+        }
+    }
+
     Ok(())
 }

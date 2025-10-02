@@ -4,6 +4,7 @@ use axum::{
     response::Json,
 };
 use base64::Engine;
+use chrono::Utc;
 use std::sync::Arc;
 use tokio::fs;
 use uuid::Uuid;
@@ -20,6 +21,7 @@ use crate::utils::{
 };
 use crate::{
     ai_services::{call_llm, call_llm_chatml, call_tts},
+    job_scheduler::reload_jobs,
     utils::to_slug,
 };
 
@@ -94,11 +96,20 @@ pub async fn create_job(
     };
 
     match save_job(&mut job).await {
-        Ok(id) => Ok(Json(ApiResponse {
-            success: true,
-            data: Some(job),
-            message: format!("Job created successfully with ID '{id}'"),
-        })),
+        Ok(id) => {
+            // Reload scheduler to pick up the new job
+            if let Err(e) = reload_jobs().await {
+                tracing::warn!("Failed to reload scheduler after creating job: {e}");
+            } else {
+                tracing::info!("Scheduler reloaded after creating job with ID '{id}'");
+            }
+
+            Ok(Json(ApiResponse {
+                success: true,
+                data: Some(job),
+                message: format!("Job created successfully with ID '{id}'"),
+            }))
+        }
         Err(e) => {
             tracing::error!("Failed to create job: {e}");
             Err((
@@ -130,11 +141,20 @@ pub async fn update_job(
             };
 
             match save_job(&mut job).await {
-                Ok(id) => Ok(Json(ApiResponse {
-                    success: true,
-                    data: Some(job),
-                    message: format!("Job updated successfully with ID '{id}'"),
-                })),
+                Ok(id) => {
+                    // Reload scheduler to pick up the updated job
+                    if let Err(e) = reload_jobs().await {
+                        tracing::warn!("Failed to reload scheduler after updating job: {e}");
+                    } else {
+                        tracing::info!("Scheduler reloaded after updating job with ID '{id}'");
+                    }
+
+                    Ok(Json(ApiResponse {
+                        success: true,
+                        data: Some(job),
+                        message: format!("Job updated successfully with ID '{id}'"),
+                    }))
+                }
                 Err(e) => {
                     tracing::error!("Failed to update job with slug '{slug}': {e}");
                     Err((
@@ -205,17 +225,25 @@ pub async fn delete_job(
     };
 
     match delete_job_by_slug(&slug).await {
-        Ok(_) => Ok(Json(ApiResponse {
-            success: true,
-            data: None,
-            message: format!(
-                "Job '{}' deleted successfully",
-                job_slug(
-                    job.characters.first().unwrap_or(&"default".to_string()),
-                    job.prompts.first().unwrap_or(&"default".to_string())
-                )
-            ),
-        })),
+        Ok(_) => {
+            let job_name = job_slug(
+                job.characters.first().unwrap_or(&"default".to_string()),
+                job.prompts.first().unwrap_or(&"default".to_string()),
+            );
+
+            // Reload scheduler to remove the deleted job
+            if let Err(e) = reload_jobs().await {
+                tracing::warn!("Failed to reload scheduler after deleting job: {e}");
+            } else {
+                tracing::info!("Scheduler reloaded after deleting job '{}'", job_name);
+            }
+
+            Ok(Json(ApiResponse {
+                success: true,
+                data: None,
+                message: format!("Job '{}' deleted successfully", job_name),
+            }))
+        }
         Err(e) => {
             tracing::error!("Failed to delete job with slug '{slug}': {e}");
             Err((
@@ -587,7 +615,7 @@ async fn execute_ai_workflow(
 
             let response_prompt = call_llm_chatml(settings, &chatml_prompt).await?;
 
-            tracing::info!(
+            tracing::trace!(
                 "LLM ChatML response for setup item {}: {:#?}",
                 i + 1,
                 response_prompt
@@ -697,6 +725,7 @@ async fn execute_ai_services(
         audio,
         images: vec![], // TODO: Add image generation support if needed
         read: false,    // New messages are unread by default
+        timestamp: Utc::now(),
     })
 }
 

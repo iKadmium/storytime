@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize)]
@@ -194,6 +195,7 @@ pub struct Message {
     pub images: Vec<String>,
     #[serde(default)]
     pub read: bool,
+    pub timestamp: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -222,6 +224,8 @@ pub struct AddMessageRequest {
     pub images: Vec<String>,
     #[serde(default)]
     pub read: bool,
+    #[serde(default)]
+    pub timestamp: Option<DateTime<Utc>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -230,6 +234,7 @@ pub struct UpdateMessageRequest {
     pub audio: Option<Vec<String>>,
     pub images: Option<Vec<String>>,
     pub read: Option<bool>,
+    pub timestamp: Option<DateTime<Utc>>,
 }
 
 // Job models

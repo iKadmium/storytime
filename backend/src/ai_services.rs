@@ -26,35 +26,46 @@ pub(crate) async fn call_llm_chatml(
 
     // Debug trace the request being sent
     tracing::debug!("Sending LLM request to: {}", settings.llm_api);
-    tracing::debug!("Prompt being sent: {}", prompt_string);
-    tracing::debug!("Kobold request parameters: {:#?}", kobold_request);
+    tracing::trace!("Kobold request parameters: {:#?}", kobold_request);
 
     let client = reqwest::Client::new();
+    let timer = std::time::Instant::now();
     let response = client
         .post(&settings.llm_api)
         .json(&kobold_request)
         .send()
         .await?;
 
+    let duration = timer.elapsed();
+
     if !response.status().is_success() {
-        return Err(format!("LLM API returned error: {}", response.status()).into());
+        return Err(format!(
+            "LLM API returned error: {}, duration: {:?}",
+            response.status(),
+            duration
+        )
+        .into());
+    } else {
+        tracing::debug!(
+            "LLM API returned success: {}, duration: {:?}",
+            response.status(),
+            duration
+        );
     }
 
     let kobold_response: KoboldCppResponse = response.json().await?;
 
     // Debug trace the raw response
-    tracing::info!("Raw Kobold response: {:#?}", kobold_response);
+    tracing::trace!("Raw Kobold response: {:#?}", kobold_response);
 
     if let Some(result) = kobold_response.results.first() {
-        tracing::debug!("Raw result text: {}", result.text);
-
         // Create a complete ChatML string with the original prompt + assistant response
         let complete_chatml = format!("{}{}", prompt_string, result.text.trim());
 
         // Parse the complete response as ChatML
         match ChatMLPrompt::from_chatml(&complete_chatml) {
             Ok(parsed_prompt) => {
-                tracing::debug!("Parsed ChatML response: {:#?}", parsed_prompt);
+                tracing::trace!("Parsed ChatML response: {:#?}", parsed_prompt);
                 Ok(parsed_prompt)
             }
             Err(e) => {
@@ -100,14 +111,28 @@ pub(crate) async fn call_llm(
     tracing::debug!("Kobold request parameters: {:#?}", kobold_request);
 
     let client = reqwest::Client::new();
+    let timer = std::time::Instant::now();
     let response = client
         .post(&settings.llm_api)
         .json(&kobold_request)
         .send()
         .await?;
 
+    let duration = timer.elapsed();
+
     if !response.status().is_success() {
-        return Err(format!("LLM API returned error: {}", response.status()).into());
+        return Err(format!(
+            "LLM API returned error: {}, duration: {:?}",
+            response.status(),
+            duration
+        )
+        .into());
+    } else {
+        tracing::debug!(
+            "LLM API returned success: {}, duration: {:?}",
+            response.status(),
+            duration
+        );
     }
 
     let kobold_response: KoboldCppResponse = response.json().await?;
@@ -178,14 +203,29 @@ pub(crate) async fn call_tts(
     };
 
     let client = reqwest::Client::new();
+    tracing::debug!("Sending TTS request to: {}", settings.tts_api);
+    tracing::trace!("TTS request parameters: {:#?}", tts_request);
+    let timer = std::time::Instant::now();
     let response = client
         .post(&settings.tts_api)
         .json(&tts_request)
         .send()
         .await?;
 
+    let duration = timer.elapsed();
     if !response.status().is_success() {
-        return Err(format!("TTS API returned error: {}", response.status()).into());
+        return Err(format!(
+            "TTS API returned error: {}, duration: {:?}",
+            response.status(),
+            duration
+        )
+        .into());
+    } else {
+        tracing::debug!(
+            "TTS API returned success: {}, duration: {:?}",
+            response.status(),
+            duration
+        );
     }
 
     let audio_bytes = response.bytes().await?;

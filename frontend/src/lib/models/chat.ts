@@ -8,6 +8,7 @@ export interface Message {
 	audio: string[];
 	images: string[];
 	read?: boolean;
+	timestamp: string; // ISO 8601 timestamp string from backend
 }
 
 export interface Chat {
@@ -28,6 +29,7 @@ export interface AddMessageRequest {
 	audio?: string[];
 	images?: string[];
 	read?: boolean;
+	timestamp?: string; // Optional ISO 8601 timestamp string
 }
 
 export interface UpdateMessageRequest {
@@ -35,6 +37,7 @@ export interface UpdateMessageRequest {
 	audio?: string[];
 	images?: string[];
 	read?: boolean;
+	timestamp?: string; // Optional ISO 8601 timestamp string
 }
 
 // Helper type for chat list display

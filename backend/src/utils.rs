@@ -69,6 +69,16 @@ pub fn chat_file_path_from_character(character: &str) -> String {
     format!("./data/chats/{}.json", character_slug(character))
 }
 
+/// Generate a file path for an audio file
+pub fn audio_file_path(character: &str, filename: &str) -> String {
+    format!("./data/audio/{}/{}", character_slug(character), filename)
+}
+
+/// Generate a file path for an image file
+pub fn image_file_path(character: &str, filename: &str) -> String {
+    format!("./data/images/{}/{}", character_slug(character), filename)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
